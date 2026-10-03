@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Pagamento · Curativa</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta name="theme-color" content="#faf6ee">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="app.css">
+<!-- SDK oficial do Mercado Pago: cria os campos seguros do cartão dentro desta página (o número não passa pelo nosso servidor) -->
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body>
+<header class="nav docked app-nav">
+  <a class="brand" href="index.html"><img src="assets/logo-clinica.jpg" alt="" width="42" height="42"><span><b>Curativa</b><small>Farmácia · pagamento</small></span></a>
+  <a class="btn" href="loja.html">← Voltar à loja</a>
+</header>
+
+<main class="app">
+  <div class="wrap">
+    <span class="eyebrow">Pagamento seguro</span>
+    <h1 class="display">Finalize seu <em>pedido.</em></h1>
+    <p class="faixa-modo" id="modo" hidden></p>
+
+    <div class="painel vazio-msg" id="sem-pedido" hidden>
+      <p class="lead">Não encontramos este pedido.</p>
+      <p class="aviso">Volte à loja e finalize a sacola de novo.</p>
+      <a class="btn solid" href="loja.html">Ir para a loja</a>
+    </div>
+
+    <div class="flow" id="checkout" hidden>
+      <div class="painel" id="pagar">
+        <h2>Seus dados</h2>
+        <div class="campos">
+          <div class="campo full"><label for="pg-nome">Nome completo</label><input id="pg-nome" autocomplete="name" required><span class="erro"></span></div>
+          <div class="campo"><label for="pg-email">E-mail</label><input id="pg-email" type="email" autocomplete="email" inputmode="email" required aria-describedby="pg-email-dica"><span class="dica" id="pg-email-dica">O comprovante chega por aqui.</span><span class="erro"></span></div>
+          <div class="campo"><label for="pg-cpf">CPF</label><input id="pg-cpf" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14" required aria-describedby="pg-cpf-dica"><span class="dica" id="pg-cpf-dica">Exigido pelo Mercado Pago para Pix e cartão.</span><span class="erro"></span></div>
+        </div>
+
+        <h2 style="margin-top:2rem">Como você quer pagar?</h2>
+        <div class="modes" role="tablist" aria-label="Forma de pagamento" style="margin:0 0 1.4rem">
+          <button role="tab" id="tab-pix" aria-selected="true" aria-controls="pn-pix">Pix</button>
+          <button role="tab" id="tab-cartao" aria-selected="false" aria-controls="pn-cartao">Cartão de crédito</button>
+        </div>
+
+        <!-- PIX -->
+        <div id="pn-pix" role="tabpanel" aria-labelledby="tab-pix">
+          <div id="pix-inicio">
+            <p class="t-m">Aprovação na hora. O código vale por 30 minutos.</p>
+            <div class="acoes"><button class="btn solid" type="button" id="pix-gerar" style="margin-left:auto">Gerar Pix</button></div>
+          </div>
+          <div class="pix-box" id="pix-box" hidden>
+            <div class="pix-qr" id="pix-qr"></div>
+            <div class="pix-info">
+              <p class="rotulo">Pix copia e cola</p>
+              <textarea id="pix-copia" class="ctl" rows="3" readonly aria-label="Código Pix copia e cola"></textarea>
+              <button class="btn solid" type="button" id="pix-copiar">Copiar código</button>
+              <p class="pix-espera" role="status" aria-live="polite"><span class="ponto"></span><span id="pix-status">Aguardando o pagamento…</span></p>
+              <p class="aviso" id="pix-expira"></p>
+              <button class="mini" type="button" id="pix-simular" hidden>Simular Pix recebido</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARTÃO -->
+        <div id="pn-cartao" role="tabpanel" aria-labelledby="tab-cartao" hidden>
+          <div class="campos">
+            <div class="campo full"><label for="cc-titular">Nome impresso no cartão</label><input id="cc-titular" autocomplete="cc-name" required><span class="erro"></span></div>
+            <div class="campo full"><label id="rot-numero">Número do cartão</label><div class="ctl campo-seguro" id="mp-numero" aria-labelledby="rot-numero"></div><span class="erro" id="err-numero"></span></div>
+            <div class="campo"><label id="rot-validade">Validade</label><div class="ctl campo-seguro" id="mp-validade" aria-labelledby="rot-validade"></div><span class="erro" id="err-validade"></span></div>
+            <div class="campo"><label id="rot-cvv">Código de segurança</label><div class="ctl campo-seguro" id="mp-cvv" aria-labelledby="rot-cvv"></div><span class="erro" id="err-cvv"></span></div>
+            <div class="campo full"><label for="cc-parcelas">Parcelas</label><select id="cc-parcelas" disabled><option>Digite o número do cartão</option></select><span class="erro"></span></div>
+          </div>
+          <div class="acoes"><span class="bandeira" id="cc-bandeira"></span><button class="btn solid" type="button" id="cc-pagar">Pagar</button></div>
+        </div>
+
+        <p class="erro-geral" id="pg-erro" role="alert"></p>
+        <p class="aviso seguro">🔒 Pagamento processado pelo Mercado Pago. Os dados do cartão vão direto para ele, criptografados, e não ficam guardados na Curativa.
+          <br><button class="link-sub" type="button" id="na-retirada">Prefiro pagar na retirada</button></p>
+      </div>
+
+      <aside class="painel resumo">
+        <span class="eyebrow">Seu pedido</span>
+        <ul class="pg-itens" id="pg-itens"></ul>
+        <dl>
+          <div><dt>Retirada</dt><dd id="pg-unidade"></dd></div>
+          <div><dt>Código</dt><dd id="pg-cod"></dd></div>
+          <div><dt>Total</dt><dd class="pg-total" id="pg-total"></dd></div>
+        </dl>
+      </aside>
+    </div>
+
+    <div class="painel feito" id="pago" hidden tabindex="-1">
+      <span class="eyebrow" id="pago-tipo">Pagamento aprovado</span>
+      <h2 class="display" style="font-size:clamp(2rem,4vw,3rem)">Obrigado, <em id="pago-nome"></em></h2>
+      <p class="lead" id="pago-texto"></p>
+      <span class="micro">Seu código</span>
+      <span class="cod" id="pago-cod"></span>
+      <p class="aviso dica-cod">Guarde este código e mostre na retirada: é com ele que a equipe encontra o seu pedido separado.</p>
+      <div class="acoes" style="justify-content:center"><a class="btn" href="index.html">Voltar ao site</a><a class="btn solid" href="loja.html">Continuar comprando</a></div>
+    </div>
+  </div>
+</main>
+
+<script src="app.js"></script>
+<script src="pagamento.js"></script>
+</body>
+</html>

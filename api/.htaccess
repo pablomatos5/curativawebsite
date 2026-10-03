@@ -1,0 +1,7 @@
+# Só os pontos de entrada da API ficam acessíveis pelo navegador.
+# Segredos, biblioteca, catálogo e os registros gravados pelo webhook ficam bloqueados.
+<FilesMatch "^(lib|catalogo|segredos.*)\.php$">
+  Require all denied
+</FilesMatch>
+RedirectMatch 403 /api/dados/
+Options -Indexes

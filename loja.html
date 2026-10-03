@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><!-- demo de proposta: fora dos buscadores -->
+<title>Loja · Curativa Farmácia</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta name="theme-color" content="#faf6ee">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="theme-farmacia">
+<header class="nav docked app-nav" style="background:rgb(234 246 240 / .92)">
+  <a class="brand" href="index.html"><img src="assets/logo-clinica.jpg" alt="" width="42" height="42"><span><b>Curativa</b><small>Farmácia · Loja</small></span></a>
+  <div style="display:flex;gap:.6rem;align-items:center">
+    <a class="btn so-desk" href="index.html#farmacia">← Site</a>
+    <button class="btn solid" id="abrir-sacola" aria-haspopup="dialog">Sacola <span id="sacola-n" class="conta">0</span></button>
+  </div>
+</header>
+
+<main class="app">
+  <div class="wrap">
+    <span class="eyebrow">Pronta entrega</span>
+    <h1 class="display">Compre e <em>retire na unidade.</em></h1>
+    <p class="lead">Produtos da linha Curativa já prontos. Escolha onde quer retirar, monte a sacola e pague na retirada.</p>
+
+    <div class="loja-barra">
+      <div class="campo" style="min-width:220px"><label for="retirada">Retirar em</label><select id="retirada"></select></div>
+      <p class="aviso" style="margin:0">Fórmulas manipuladas com receita são pedidas em <a href="agendar.html?modo=farmacia" style="text-decoration:underline">Enviar minha receita</a>.</p>
+    </div>
+
+    <div class="produtos" id="grade-loja"></div>
+    <p class="note">Preços e estoques desta demonstração são de exemplo.</p>
+  </div>
+</main>
+<div class="faixa-demo">Protótipo de proposta: nenhum pagamento é feito e os dados ficam salvos só neste navegador. <a href="admin.html" style="text-decoration:underline">Ver o painel administrativo →</a></div>
+
+<dialog id="sacola" class="dlg" aria-labelledby="sacola-titulo">
+  <div id="sacola-corpo">
+    <h2 class="display" style="font-size:1.9rem" id="sacola-titulo">Sua <em>sacola</em></h2>
+    <ul id="sacola-itens" class="sacola-itens"></ul>
+    <div class="sacola-total"><span>Total</span><strong id="sacola-total">R$ 0,00</strong></div>
+    <form id="form-loja" novalidate>
+      <div class="campos">
+        <div class="campo full"><label for="lj-nome">Nome completo</label><input id="lj-nome" autocomplete="name" required><span class="erro"></span></div>
+        <div class="campo full"><label for="lj-tel">Celular com WhatsApp</label><input id="lj-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(91) 90000-0000" aria-describedby="lj-tel-dica" required><span class="dica" id="lj-tel-dica">É por ele que avisamos quando o pedido estiver pronto para retirar.</span><span class="erro"></span></div>
+        <fieldset class="campo full forma-pag" style="border:0">
+          <legend class="rotulo" style="margin-bottom:.5rem">Pagamento</legend>
+          <label class="opcao"><input type="radio" name="forma" value="online" checked><span>Pagar agora<small>Pix ou cartão de crédito, aqui no site</small></span></label>
+          <label class="opcao"><input type="radio" name="forma" value="retirada"><span>Pagar na retirada<small>Na unidade, quando buscar o pedido</small></span></label>
+        </fieldset>
+        <label class="aceite full"><input type="checkbox" id="lj-aceite" required> Autorizo a Curativa a usar estes dados para separar meu pedido e avisar quando estiver pronto.</label>
+      </div>
+      <span class="erro" id="lj-erro" role="alert" style="font-size:.74rem;color:#b3261e;display:block;min-height:1.2em;margin-top:.5rem"></span>
+      <p class="aviso" id="lj-onde"></p>
+      <div class="acoes"><button class="btn" type="button" data-fechar>Continuar comprando</button><button class="btn solid" type="submit" id="lj-finalizar">Finalizar pedido</button></div>
+    </form>
+  </div>
+  <div id="sacola-feito" class="feito" hidden>
+    <span class="eyebrow">Pedido recebido</span>
+    <h2 class="display" style="font-size:2.2rem">Obrigado, <em id="lj-quem"></em></h2>
+    <p class="lead" id="lj-texto" style="text-align:center"></p>
+    <span class="micro">Seu código</span><span class="cod" id="lj-cod"></span>
+    <p class="aviso dica-cod">Guarde este código e mostre na retirada: é com ele que a equipe encontra o seu pedido separado.</p>
+    <button class="btn solid" type="button" data-fechar>Fechar</button>
+  </div>
+</dialog>
+
+<!-- detalhes do produto -->
+<dialog id="detalhe" class="dlg det" aria-labelledby="det-nome">
+  <div class="det-grid">
+    <div class="det-foto"><img id="det-img" src="" alt=""></div>
+    <div class="det-txt">
+      <span class="micro" id="det-cat"></span>
+      <h2 class="display" id="det-nome" style="font-size:2rem;margin:.4rem 0 .6rem"></h2>
+      <p id="det-desc" style="color:var(--fg-muted)"></p>
+      <p class="price" id="det-preco" style="font-size:2rem;margin:1rem 0 .4rem"></p>
+      <p class="aviso" id="det-estoque" style="margin:0 0 1rem"></p>
+      <div class="campo" id="det-var-bloco"><label for="det-var">Opção</label><select id="det-var"></select></div>
+      <div class="acoes"><button class="btn" type="button" data-fechar>Voltar</button><button class="btn solid" type="button" id="det-add">Adicionar à sacola</button></div>
+    </div>
+  </div>
+</dialog>
+
+<!-- aviso de item adicionado -->
+<div class="toast" id="toast" role="status" aria-live="polite"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg><span id="toast-msg"></span><button type="button" data-ver-sacola>Ver sacola</button></div>
+
+<script src="app.js"></script>
+<script src="loja.js"></script>
+</body>
+</html>

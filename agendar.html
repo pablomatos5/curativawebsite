@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><!-- demo de proposta: fora dos buscadores -->
+<title>Agendar · Curativa</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta name="theme-color" content="#faf6ee">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="nav docked app-nav">
+  <a class="brand" href="index.html"><img src="assets/logo-clinica.jpg" alt="" width="42" height="42"><span><b>Curativa</b><small>Estética · Farmácia</small></span></a>
+  <a class="btn" href="index.html">← Voltar ao site</a>
+</header>
+
+<main class="app" id="app">
+  <div class="wrap">
+    <span class="eyebrow">Atendimento online</span>
+    <h1 class="display" id="titulo">Agende sua <em>avaliação.</em></h1>
+    <p class="lead" id="sub">Tudo começa por uma avaliação. Escolha a unidade, a área que você quer avaliar e o horário.</p>
+
+    <div class="modes" role="tablist" aria-label="Tipo de atendimento">
+      <button role="tab" id="tab-clinica" aria-selected="true" aria-controls="fluxo-clinica">Clínica · avaliação</button>
+      <button role="tab" id="tab-farmacia" aria-selected="false" aria-controls="fluxo-farmacia">Farmácia · pedido</button>
+    </div>
+
+    <!-- CLÍNICA: assistente em 4 passos -->
+    <div class="flow" id="fluxo-clinica" role="tabpanel" aria-labelledby="tab-clinica">
+      <form class="painel" id="form-ag" novalidate>
+        <ol class="passos" aria-label="Etapas">
+          <li data-n="1">Unidade</li><li data-n="2">Área</li><li data-n="3">Horário</li><li data-n="4">Seus dados</li>
+        </ol>
+
+        <fieldset class="passo" data-passo="1">
+          <h2>Em qual unidade?</h2>
+          <div class="opcoes" id="op-unidade"></div>
+        </fieldset>
+
+        <fieldset class="passo" data-passo="2" hidden>
+          <h2>O que você quer avaliar?</h2>
+          <div class="opcoes" id="op-ambito"></div>
+          <p class="aviso">Aqui você agenda só a avaliação. O procedimento é definido nela e marcado depois pela nossa equipe.</p>
+        </fieldset>
+
+        <fieldset class="passo" data-passo="3" hidden>
+          <h2>Escolha dia e horário</h2>
+          <p class="aviso" id="dia-info" style="margin:0 0 1rem"></p>
+          <div class="dias" id="op-dia"></div>
+          <div class="horas" id="op-hora"></div>
+        </fieldset>
+
+        <fieldset class="passo" data-passo="4" hidden>
+          <h2>Seus dados</h2>
+          <div class="campos">
+            <div class="campo full"><label for="ag-nome">Nome completo</label><input id="ag-nome" name="nome" autocomplete="name" required><span class="erro"></span></div>
+            <div class="campo"><label for="ag-tel">Celular com WhatsApp</label><input id="ag-tel" name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(91) 90000-0000" aria-describedby="ag-tel-dica" required><span class="dica" id="ag-tel-dica">É por ele que a equipe confirma seu horário.</span><span class="erro"></span></div>
+            <div class="campo"><label for="ag-email">E-mail (opcional)</label><input id="ag-email" name="email" type="email" autocomplete="email"><span class="erro"></span></div>
+            <div class="campo full"><label for="ag-obs">Algo que a equipe deve saber? (opcional)</label><textarea id="ag-obs" name="obs" rows="3"></textarea></div>
+            <label class="aceite full"><input type="checkbox" id="ag-aceite" required> Autorizo a Curativa a usar estes dados para agendar e entrar em contato sobre este atendimento.</label>
+          </div>
+          <span class="erro" id="ag-erro-aceite" style="font-size:.72rem;color:#b3261e"></span>
+        </fieldset>
+
+        <div class="acoes">
+          <button class="btn" type="button" id="ag-voltar" hidden>← Voltar</button>
+          <button class="btn solid" type="button" id="ag-avancar" style="margin-left:auto">Continuar →</button>
+        </div>
+      </form>
+
+      <aside class="painel resumo" aria-live="polite">
+        <span class="eyebrow">Resumo</span>
+        <dl style="margin-top:1.2rem">
+          <div><dt>Unidade</dt><dd id="r-unidade" class="vazio">—</dd></div>
+          <div><dt>Avaliação</dt><dd id="r-ambito" class="vazio">—</dd></div>
+          <div><dt>Data e hora</dt><dd id="r-quando" class="vazio">—</dd></div>
+        </dl>
+      </aside>
+    </div>
+
+    <!-- FARMÁCIA: pedido com receita -->
+    <div class="flow" id="fluxo-farmacia" role="tabpanel" aria-labelledby="tab-farmacia" hidden>
+      <form class="painel" id="form-ped" novalidate>
+        <h2>Seu pedido</h2>
+        <p class="aviso" style="margin:-.6rem 0 1.2rem">Quer um produto pronto, como Body Mist ou Base Stick? <a href="loja.html" style="text-decoration:underline">Compre na loja e retire na unidade</a>.</p>
+        <div class="campos">
+          <div class="campo"><label for="pd-unidade">Unidade</label><select id="pd-unidade" name="unidade" required></select><span class="erro"></span></div>
+          <div class="campo"><label for="pd-tipo">O que você precisa?</label>
+            <select id="pd-tipo" name="tipo" required>
+              <option value="formula">Fórmula manipulada (tenho receita)</option>
+              <option value="produto">Produto da linha Curativa</option>
+            </select><span class="erro"></span></div>
+          <div class="campo full" id="bloco-receita"><label for="pd-arquivo">Receita (foto ou PDF)</label><input id="pd-arquivo" name="arquivo" type="file" accept="image/*,.pdf"><span class="erro"></span></div>
+          <div class="campo full"><label for="pd-obs" id="pd-obs-rotulo">Observações (opcional)</label><textarea id="pd-obs" name="obs" rows="3"></textarea><span class="erro"></span></div>
+          <div class="campo full"><label for="pd-nome">Nome completo</label><input id="pd-nome" name="nome" autocomplete="name" required><span class="erro"></span></div>
+          <div class="campo"><label for="pd-tel">Celular com WhatsApp</label><input id="pd-tel" name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(91) 90000-0000" aria-describedby="pd-tel-dica" required><span class="dica" id="pd-tel-dica">É por ele que a equipe envia valor, prazo e aviso de pronto.</span><span class="erro"></span></div>
+          <div class="campo"><label for="pd-entrega">Como prefere receber?</label>
+            <select id="pd-entrega" name="entrega"><option value="retirada">Retirar na unidade</option><option value="entrega">Entrega</option></select></div>
+          <div class="campo full aviso-receita" id="bloco-ciente">
+            <p><strong>Receita original obrigatória.</strong> A foto enviada aqui serve para orçar e preparar a fórmula. <span id="pd-ciente-quando">No ato da retirada</span>, é preciso apresentar a receita original. Sem ela, o pedido não é entregue.</p>
+            <label class="aceite"><input type="checkbox" id="pd-ciente"> <span id="pd-ciente-txt">Estou ciente de que devo apresentar a receita original no ato da retirada.</span></label>
+            <span class="erro" id="pd-erro-ciente"></span>
+          </div>
+          <label class="aceite full"><input type="checkbox" id="pd-aceite" required> Autorizo a Curativa a usar estes dados e a receita enviada para orçar e preparar meu pedido.</label>
+        </div>
+        <span class="erro" id="pd-erro-aceite" style="font-size:.72rem;color:#b3261e"></span>
+        <div class="acoes"><button class="btn solid" type="submit" style="margin-left:auto">Enviar pedido</button></div>
+        <p class="aviso">A equipe confere a prescrição e retorna com valor e prazo. Medicamentos manipulados só são preparados mediante prescrição de profissional habilitado. <strong>Protótipo:</strong> nesta demonstração o arquivo não é enviado a lugar nenhum.</p>
+      </form>
+      <aside class="painel resumo">
+        <span class="eyebrow">Como funciona</span>
+        <ol class="steps" style="grid-template-columns:1fr;margin-top:1rem;gap:0">
+          <li class="step" style="padding:1rem 0"><h3 class="display" style="font-size:1.3rem">Envie</h3><p>Receita e dados, por aqui.</p></li>
+          <li class="step" style="padding:1rem 0"><h3 class="display" style="font-size:1.3rem">Acompanhe</h3><p>Valor, prazo e aviso de pronto pelo WhatsApp.</p></li>
+          <li class="step" style="padding:1rem 0"><h3 class="display" style="font-size:1.3rem">Receba</h3><p>Retirada ou entrega.</p></li>
+        </ol>
+      </aside>
+    </div>
+
+    <!-- confirmação (comum aos dois) -->
+    <div class="painel feito" id="feito" hidden tabindex="-1">
+      <span class="eyebrow" id="feito-tipo">Solicitação enviada</span>
+      <h2 class="display" style="font-size:clamp(2rem,4vw,3rem)">Recebemos, <em id="feito-nome"></em></h2>
+      <p class="lead" id="feito-texto"></p>
+      <span class="micro">Seu código</span>
+      <span class="cod" id="feito-cod"></span>
+      <p class="aviso dica-cod" id="feito-dica"></p>
+      <div class="acoes" style="justify-content:center"><a class="btn" href="index.html">Voltar ao site</a><a class="btn solid" href="agendar.html">Novo atendimento</a></div>
+    </div>
+  </div>
+</main>
+<div class="faixa-demo">Protótipo de proposta: os dados ficam salvos só neste navegador. <a href="admin.html" style="text-decoration:underline">Ver o painel administrativo →</a></div>
+
+<script src="app.js"></script>
+<script src="agendar.js"></script>
+</body>
+</html>

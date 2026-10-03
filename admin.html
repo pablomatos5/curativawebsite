@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel · Curativa</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<meta name="theme-color" content="#faf6ee">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="faixa-demo">Protótipo: sem login real e com dados fictícios. No sistema final, cada funcionário entra com usuário e senha próprios e só vê a sua unidade.</div>
+<header class="nav docked app-nav" style="position:sticky">
+  <a class="brand" href="index.html"><img src="assets/logo-clinica.jpg" alt="" width="42" height="42"><span><b>Curativa</b><small>Painel administrativo</small></span></a>
+  <button class="btn" id="sair" hidden>Sair</button>
+</header>
+
+<main class="app" style="min-height:auto">
+  <div class="entrada" id="entrada">
+    <span class="eyebrow">Área restrita</span>
+    <h1 class="display" style="font-size:2.6rem">Painel da <em>equipe.</em></h1>
+    <p class="lead">Agenda das unidades, escalas dos profissionais, avaliações solicitadas e pedidos da farmácia num só lugar.</p>
+    <button class="btn solid" id="entrar">Entrar na demonstração</button>
+  </div>
+
+  <div class="wrap" id="painel" hidden style="padding-top:2.5rem">
+    <div class="adm-top">
+      <div><span class="eyebrow">Painel</span><h1 class="display" style="font-size:clamp(2rem,4vw,3rem);margin:.6rem 0 0">Bom dia, <em>equipe.</em></h1></div>
+      <div class="filtros">
+        <div class="campo"><label for="f-unidade">Unidade</label><select id="f-unidade" class="ctl"></select></div>
+        <button class="btn solid" id="novo-ag" style="padding:.75rem 1.2rem">+ Novo agendamento</button>
+        <button class="mini" id="exportar">Exportar CSV</button>
+        <button class="mini perigo" id="resetar">Restaurar exemplo</button>
+      </div>
+    </div>
+
+    <div class="atencao-faixa" id="atencao" role="status" hidden></div>
+
+    <div class="kpis">
+      <div class="painel kpi"><b id="k-hoje">0</b><span>Atendimentos hoje</span></div>
+      <div class="painel kpi"><b id="k-pend">0</b><span>Avaliações a confirmar</span></div>
+      <div class="painel kpi"><b id="k-marcar">0</b><span>Aguardando procedimento</span></div>
+      <div class="painel kpi"><b id="k-ped">0</b><span>Pedidos em aberto</span></div>
+    </div>
+
+    <div class="abas" role="tablist">
+      <button role="tab" aria-selected="true" data-aba="agenda">Agenda do dia</button>
+      <button role="tab" aria-selected="false" data-aba="lista">Agendamentos</button>
+      <button role="tab" aria-selected="false" data-aba="escalas">Escalas</button>
+      <button role="tab" aria-selected="false" data-aba="pedidos">Pedidos da farmácia</button>
+      <button role="tab" aria-selected="false" data-aba="estoque">Estoque da loja</button>
+    </div>
+
+    <section class="aba" data-aba="agenda" style="background:none">
+      <div class="dia-nav">
+        <button class="mini seta" id="d-ant" aria-label="Dia anterior"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <strong id="d-txt"></strong>
+        <button class="mini seta" id="d-prox" aria-label="Próximo dia"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="mini" id="d-hoje">Hoje</button>
+      </div>
+      <div class="plantao" id="plantao"></div>
+      <div class="grade" id="grade"></div>
+      <p class="aviso" id="grade-dica" hidden>Cada coluna é um profissional em escala. Clique em um horário livre para agendar direto com ele.</p>
+    </section>
+
+    <section class="aba" data-aba="lista" hidden style="background:none">
+      <div class="filtros" style="margin-bottom:1rem">
+        <div class="campo"><label for="f-tipo">Tipo</label><select id="f-tipo" class="ctl"><option value="">Todos</option><option value="avaliacao">Avaliações</option><option value="procedimento">Procedimentos</option></select></div>
+        <div class="campo"><label for="f-status">Status</label><select id="f-status" class="ctl"><option value="">Todos</option></select></div>
+        <div class="campo"><label for="f-busca">Buscar</label><input id="f-busca" class="ctl" placeholder="Nome, telefone ou código"></div>
+      </div>
+      <div class="tabela-wrap"><table>
+        <thead><tr><th>Data</th><th>Hora</th><th>Unidade</th><th>Atendimento</th><th>Profissional</th><th>Cliente</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="t-ag"></tbody>
+      </table></div>
+    </section>
+
+    <section class="aba" data-aba="escalas" hidden style="background:none">
+      <div class="adm-top" style="margin-bottom:1.2rem">
+        <p class="lead" style="max-width:62ch">A escala define em que unidade, dias e horários cada profissional atende. Navegue pelas semanas para organizar as próximas. O site só oferece horário quando há alguém da área escalado.</p>
+        <div class="filtros"><button class="mini" id="novo-prof">+ Profissional</button><button class="mini" id="nova-folga">+ Folga ou férias</button><button class="btn solid" id="nova-esc" style="padding:.75rem 1.2rem">+ Escala</button></div>
+      </div>
+      <div class="dia-nav sem-nav">
+        <button class="mini seta" id="s-ant" aria-label="Semana anterior"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <strong id="s-txt"></strong>
+        <button class="mini seta" id="s-prox" aria-label="Próxima semana"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="mini" id="s-hoje">Esta semana</button>
+      </div>
+      <div class="tabela-wrap"><table class="matriz">
+        <thead id="h-esc"></thead>
+        <tbody id="t-esc"></tbody>
+      </table></div>
+      <ul class="legenda" aria-label="Legenda">
+        <li><span class="turno">08:00–12:00</span> toda semana</li>
+        <li><span class="turno temp">08:00–12:00<small>até 20/10</small></span> com data para acabar</li>
+        <li><span class="turno off">Folga</span> só naquele dia, ou folga/férias por período</li>
+      </ul>
+      <p class="aviso">Clique no × de um turno para tirar só aquele dia ou aquele dia da semana daqui em diante. Profissional inativo não recebe agendamentos.</p>
+    </section>
+
+    <section class="aba" data-aba="pedidos" hidden style="background:none">
+      <div class="tabela-wrap"><table>
+        <thead><tr><th>Recebido</th><th>Unidade</th><th>Cliente</th><th>Tipo</th><th>Receita / itens</th><th>Entrega</th><th>Pagamento</th><th>Código</th><th>Status</th></tr></thead>
+        <tbody id="t-ped"></tbody>
+      </table></div>
+    </section>
+    <section class="aba" data-aba="estoque" hidden style="background:none">
+      <p class="lead" style="max-width:62ch;margin-bottom:1rem">Quantidade pronta para retirada em cada unidade. A loja do site só vende o que há aqui, e cada pedido já reserva os itens.</p>
+      <div class="tabela-wrap"><table>
+        <thead id="h-est"></thead>
+        <tbody id="t-est"></tbody>
+      </table></div>
+    </section>
+  </div>
+</main>
+
+<!-- novo agendamento (secretaria): procedimento após avaliação, ou avaliação por telefone/balcão -->
+<dialog id="dlg-ag" class="dlg">
+  <form method="dialog" id="form-nag" novalidate>
+    <h2 class="display" style="font-size:1.9rem">Novo <em>agendamento</em></h2>
+    <div class="campos">
+      <div class="campo"><label for="n-tipo">Tipo</label><select id="n-tipo"><option value="procedimento">Procedimento</option><option value="avaliacao">Avaliação</option></select></div>
+      <div class="campo"><label for="n-oque" id="n-oque-rot">Procedimento</label><select id="n-oque"></select></div>
+      <div class="campo"><label for="n-unidade">Unidade</label><select id="n-unidade"></select></div>
+      <div class="campo"><label for="n-data">Data</label><input type="date" id="n-data" required></div>
+      <div class="campo"><label for="n-prof">Profissional (pela escala)</label><select id="n-prof"></select><span class="erro" id="n-prof-erro"></span></div>
+      <div class="campo"><label for="n-hora">Horário livre</label><select id="n-hora"></select></div>
+      <div class="campo"><label for="n-nome">Cliente</label><input id="n-nome" required><span class="erro"></span></div>
+      <div class="campo"><label for="n-tel">Celular com WhatsApp</label><input id="n-tel" type="tel" required><span class="erro"></span></div>
+      <div class="campo full"><label for="n-obs">Observações (opcional)</label><textarea id="n-obs" rows="2"></textarea></div>
+    </div>
+    <div class="acoes"><button class="btn" type="button" data-fechar>Cancelar</button><button class="btn solid" type="submit" id="n-salvar">Agendar</button></div>
+  </form>
+</dialog>
+
+<!-- remarcar: move o atendimento; depois de uma falta, cria um novo e guarda o registro da falta -->
+<dialog id="dlg-rem" class="dlg">
+  <form method="dialog" id="form-rem" novalidate>
+    <h2 class="display" style="font-size:1.9rem" id="rem-titulo">Remarcar <em>atendimento</em></h2>
+    <p class="aviso" id="rem-resumo" style="margin:-.4rem 0 1.2rem"></p>
+    <div class="campos">
+      <div class="campo"><label for="r-unidade">Unidade</label><select id="r-unidade"></select></div>
+      <div class="campo"><label for="r-data">Nova data</label><input type="date" id="r-data" required></div>
+      <div class="campo"><label for="r-prof">Profissional (pela escala)</label><select id="r-prof"></select></div>
+      <div class="campo"><label for="r-hora">Horário livre</label><select id="r-hora"></select></div>
+    </div>
+    <span class="erro" id="r-erro" style="font-size:.72rem;color:#b3261e"></span>
+    <div class="acoes"><button class="btn" type="button" data-fechar>Voltar</button><button class="btn solid" type="submit" id="r-salvar">Salvar nova data</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-can" class="dlg">
+  <form method="dialog" id="form-can" novalidate>
+    <h2 class="display" style="font-size:1.9rem">Cancelar <em>atendimento</em></h2>
+    <p class="aviso" id="can-resumo" style="margin:-.4rem 0 1.2rem"></p>
+    <div class="campos">
+      <div class="campo full"><label for="c-motivo">Motivo</label><select id="c-motivo"></select></div>
+      <div class="campo full"><label for="c-obs">Detalhe (opcional)</label><input id="c-obs"></div>
+    </div>
+    <div class="acoes"><button class="btn" type="button" data-fechar>Voltar</button><button class="btn solid" type="submit">Cancelar atendimento</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-prof" class="dlg">
+  <form method="dialog" id="form-prof" novalidate>
+    <h2 class="display" style="font-size:1.9rem" id="prof-titulo">Novo <em>profissional</em></h2>
+    <div class="campos">
+      <div class="campo full"><label for="p-nome">Nome</label><input id="p-nome" required><span class="erro"></span></div>
+      <fieldset class="campo full" style="border:0"><legend class="rotulo" style="margin-bottom:.5rem">Áreas em que atende</legend><div class="checks" id="p-ambitos"></div><span class="erro" id="p-erro"></span></fieldset>
+      <label class="aceite full"><input type="checkbox" id="p-ativo" checked> Ativo (recebe agendamentos)</label>
+    </div>
+    <div class="acoes"><button class="btn" type="button" data-fechar>Cancelar</button><button class="btn solid" type="submit">Salvar</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlg-esc" class="dlg">
+  <form method="dialog" id="form-esc" novalidate>
+    <h2 class="display" style="font-size:1.9rem">Nova <em>escala</em></h2>
+    <div class="campos">
+      <div class="campo"><label for="e-prof">Profissional</label><select id="e-prof"></select></div>
+      <div class="campo"><label for="e-unidade">Unidade</label><select id="e-unidade"></select></div>
+      <fieldset class="campo full" style="border:0"><legend class="rotulo" style="margin-bottom:.5rem">Dias da semana</legend><div class="checks" id="e-dias"></div></fieldset>
+      <div class="campo"><label for="e-inicio">Início</label><select id="e-inicio"></select></div>
+      <div class="campo"><label for="e-fim">Fim</label><select id="e-fim"></select></div>
+      <fieldset class="campo full" style="border:0"><legend class="rotulo" style="margin-bottom:.5rem">Vale para</legend>
+        <div class="opcoes vale">
+          <label class="opcao"><input type="radio" name="vale" value="sempre" checked><span>Toda semana<small>sem data para acabar</small></span></label>
+          <label class="opcao"><input type="radio" name="vale" value="semana"><span>Só uma semana<small id="e-semana-txt"></small></span></label>
+          <label class="opcao"><input type="radio" name="vale" value="periodo"><span>Um período<small>com início e fim</small></span></label>
+        </div>
+      </fieldset>
+      <div class="campo" id="e-de-bloco"><label for="e-de">A partir de</label><input type="date" id="e-de"></div>
+      <div class="campo" id="e-ate-bloco"><label for="e-ate">Até</label><input type="date" id="e-ate"></div>
+    </div>
+    <span class="erro" id="e-erro" style="font-size:.72rem;color:#b3261e"></span>
+    <div class="acoes"><button class="btn" type="button" data-fechar>Cancelar</button><button class="btn solid" type="submit">Salvar escala</button></div>
+  </form>
+</dialog>
+
+<!-- tirar um turno: só naquele dia (folga pontual) ou aquele dia da semana daqui em diante -->
+<dialog id="dlg-tirar" class="dlg">
+  <form method="dialog" id="form-tirar" novalidate>
+    <h2 class="display" style="font-size:1.9rem">Tirar <em>turno</em></h2>
+    <p class="aviso" id="tirar-resumo" style="margin:-.4rem 0 1.2rem"></p>
+    <div class="opcoes" style="grid-template-columns:1fr 1fr">
+      <label class="opcao"><input type="radio" name="tirar" value="dia" checked><span>Só neste dia<small id="tirar-dia"></small></span></label>
+      <label class="opcao"><input type="radio" name="tirar" value="diante"><span>Daqui em diante<small id="tirar-diante"></small></span></label>
+    </div>
+    <div class="acoes"><button class="btn" type="button" data-fechar>Voltar</button><button class="btn solid" type="submit">Tirar turno</button></div>
+  </form>
+</dialog>
+
+<!-- folga, férias ou afastamento por período: o profissional some da agenda nesses dias, em todas as unidades -->
+<dialog id="dlg-folga" class="dlg">
+  <form method="dialog" id="form-folga" novalidate>
+    <h2 class="display" style="font-size:1.9rem">Folga ou <em>férias</em></h2>
+    <div class="campos">
+      <div class="campo full"><label for="fo-prof">Profissional</label><select id="fo-prof"></select></div>
+      <div class="campo"><label for="fo-de">De</label><input type="date" id="fo-de" required></div>
+      <div class="campo"><label for="fo-ate">Até</label><input type="date" id="fo-ate" required></div>
+      <div class="campo full"><label for="fo-motivo">Motivo</label><select id="fo-motivo"><option>Folga</option><option>Férias</option><option>Atestado</option><option>Curso ou evento</option><option>Outro</option></select></div>
+    </div>
+    <span class="erro" id="fo-erro" style="font-size:.72rem;color:#b3261e"></span>
+    <div class="acoes"><button class="btn" type="button" data-fechar>Cancelar</button><button class="btn solid" type="submit">Salvar</button></div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

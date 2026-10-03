@@ -1,0 +1,9 @@
+# fica só no PC: anotações internas da proposta e atalho local
+LEIA-ME.md
+abrir.bat
+# credenciais do Mercado Pago nunca vão para o repositório
+api/segredos.php
+curativa-segredos.php
+# arquivos de teste e rascunho
+_teste.html
+*.bak
