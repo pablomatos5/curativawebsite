@@ -87,6 +87,8 @@ document.addEventListener("click", (e) => {
     if (confirm(`O horário de ${a.nome} (${dataBR(a.data)} às ${a.hora}) já passou ou foi ocupado por outra pessoa.\n\nEscolher uma nova data?`)) abrirRemarcar(a, false);
     return;
   }
+  const nd2 = t.closest("button[data-novo-dia]");
+  if (nd2) return abrirNovo(null, null, nd2.dataset.novoDia);
   const lv = t.closest("button[data-livre]");
   if (lv) { const [prof, hora] = lv.dataset.livre.split("|"); return abrirNovo(null, { prof, hora }); }
   if (t.closest("#ver-atencao")) { $("#f-status").value = "atencao"; abrirAba("lista"); return tudo(); }
@@ -207,17 +209,56 @@ function agenda(ag) {
 // fim do turno = último horário + 30 min
 const fimDe = (horas) => { const [h, m] = horas[horas.length - 1].split(":").map(Number); const t = h * 60 + m + 30; return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0"); };
 
+// ---------- período da lista de agendamentos ----------
+let pData = iso(hoje());
+const sabadoDe = (d) => iso(addDias(new Date(segundaDe(d) + "T12:00"), 5));
+const nomeDia = (d) => `${diaSemana(d)}, ${dataBR(d).slice(0, 5)}`;
+function noPeriodo(a) {
+  const p = $("#f-periodo").value;
+  if (p === "dia") return a.data === pData;
+  if (p === "semana") return a.data >= segundaDe(pData) && a.data <= sabadoDe(pData);
+  if (p === "proximos") return a.data >= iso(hoje());
+  return true;
+}
+function periodoTopo() {
+  const p = $("#f-periodo").value, navega = p === "dia" || p === "semana";
+  $("#p-ant").hidden = $("#p-prox").hidden = !navega;
+  $("#p-txt").textContent = p === "dia" ? nomeDia(pData) : p === "semana" ? `Semana de ${dataBR(segundaDe(pData)).slice(0, 5)} a ${dataBR(sabadoDe(pData)).slice(0, 5)}` : p === "proximos" ? "De hoje em diante" : "Todas as datas";
+  $("#p-data").value = pData;
+  $("#p-hoje").hidden = p === "dia" ? pData === iso(hoje()) : p === "semana" ? segundaDe(pData) === segundaDe(iso(hoje())) : true;
+  const alvo = pData < iso(hoje()) ? iso(hoje()) : pData;
+  $("#p-novo-dia").textContent = nomeDia(alvo);
+}
+const passoPer = (n) => { pData = iso(addDias(new Date(pData + "T12:00"), n * ($("#f-periodo").value === "semana" ? 7 : 1))); tudo(); };
+$("#p-ant").onclick = () => passoPer(-1);
+$("#p-prox").onclick = () => passoPer(1);
+$("#p-hoje").onclick = () => { pData = iso(hoje()); tudo(); };
+$("#p-data").onchange = () => { if ($("#p-data").value) { pData = $("#p-data").value; tudo(); } };
+$("#f-periodo").onchange = tudo;
+pilulas($("#f-periodo"));
+$("#p-novo").onclick = () => abrirNovo(null, null, pData < iso(hoje()) ? iso(hoje()) : pData);
+
 function lista(ag) {
   const st = $("#f-status").value, tp = $("#f-tipo").value, q = $("#f-busca").value.trim().toLowerCase();
-  const rows = ag.filter((a) => (!st || (st === "atencao" ? Store.problema(a) : a.status === st)) && (!tp || (a.tipo || "avaliacao") === tp))
+  periodoTopo();
+  $("#per-aviso").hidden = !q;
+  // com busca, procura em todas as datas (quem busca um nome raramente sabe o dia)
+  const rows = ag.filter((a) => (q || noPeriodo(a)) && (!st || (st === "atencao" ? Store.problema(a) : a.status === st)) && (!tp || (a.tipo || "avaliacao") === tp))
     .filter((a) => !q || [a.nome, a.telefone, a.id].some((v) => String(v).toLowerCase().includes(q)))
     .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
-  $("#t-ag").innerHTML = rows.length ? rows.map((a) => `<tr>
-    <td>${dataBR(a.data)}</td><td>${a.hora}</td><td>${tagUn(a.unidade)}</td><td>${esc(rotuloAg(a))}</td><td>${esc(Store.nomeProf(a.prof))}</td>
+  // agrupa por dia: cabeçalho com a data, a contagem e um atalho para agendar naquele dia
+  const futuro = (d) => d >= iso(hoje());
+  const cab = (d, n) => `<tr class="dia-sep${d === iso(hoje()) ? " hoje" : ""}"><td colspan="7"><div><strong>${nomeDia(d)}</strong>${d === iso(hoje()) ? ` <span class="selo confirmado">Hoje</span>` : ""}
+    <small>${n ? `${n} atendimento${n === 1 ? "" : "s"}` : "nenhum atendimento"}</small>${futuro(d) ? `<button class="mini" data-novo-dia="${d}">+ Agendar</button>` : ""}</div></td></tr>`;
+  // na semana e no dia, mostra também os dias sem nada (com o atalho para agendar)
+  const p = $("#f-periodo").value, dias = !q && p === "semana" ? [0, 1, 2, 3, 4, 5].map((i) => iso(addDias(new Date(segundaDe(pData) + "T12:00"), i))) : !q && p === "dia" ? [pData] : [...new Set(rows.map((a) => a.data))];
+  const linha = (a) => `<tr>
+    <td>${a.hora}</td><td>${tagUn(a.unidade)}</td><td>${esc(rotuloAg(a))}</td><td>${esc(Store.nomeProf(a.prof))}</td>
     <td>${esc(a.nome)}<br><small style="color:var(--fg-faint)">${esc(a.telefone)} · <code>${esc(a.id)}</code></small></td>
     <td><span class="selo ${a.status}">${STATUS_AG[a.status]}</span>${Store.problema(a) ? `<br><span class="selo atencao" style="margin-top:.3rem">${esc(Store.problema(a))}</span>` : ""}${a.status === "cancelado" && a.motivo ? `<br><small style="color:var(--fg-faint)">${esc(a.motivo)}</small>` : ""}</td>
-    <td><div class="acoes-ag">${acoesAg(a)}</div></td></tr>`).join("")
-    : `<tr><td colspan="8" class="vazio-msg">Nada encontrado.</td></tr>`;
+    <td><div class="acoes-ag">${acoesAg(a)}</div></td></tr>`;
+  const html = dias.map((d) => { const doDia = rows.filter((a) => a.data === d); return cab(d, doDia.length) + doDia.map(linha).join(""); }).join("");
+  $("#t-ag").innerHTML = html || `<tr><td colspan="7" class="vazio-msg">Nada encontrado.</td></tr>`;
 }
 
 // ---------- escalas por semana ----------
@@ -423,12 +464,13 @@ $("#resetar").onclick = () => { if (confirm("Apagar tudo o que foi cadastrado ne
 // ---------- novo agendamento (secretaria) ----------
 let origem = null; // avaliação que deu origem ao procedimento
 // `vaga` vem do clique num horário livre da agenda: já chega com profissional e hora escolhidos
-function abrirNovo(av, vaga) {
+function abrirNovo(av, vaga, data) {
   origem = av || null;
   $("#form-nag").reset();
   $("#n-unidade").innerHTML = optUnidades;
   $("#n-unidade").value = av ? av.unidade : unidadeSel() || "cameta";
-  $("#n-data").min = iso(hoje()); $("#n-data").value = dia < iso(hoje()) ? iso(hoje()) : dia;
+  const quando = data || dia;
+  $("#n-data").min = iso(hoje()); $("#n-data").value = quando < iso(hoje()) ? iso(hoje()) : quando;
   $("#n-tipo").value = "procedimento";
   if (av) { $("#n-nome").value = av.nome; $("#n-tel").value = av.telefone; }
   const prof = vaga && acha(Store.profissionais(), vaga.prof);

@@ -374,3 +374,18 @@ td select.ctl { padding-right: 2rem; background-position: right .5rem center; ba
 .matriz th small.uso { display: block; margin-top: .25rem; font-size: .58rem; letter-spacing: .08em; color: var(--fg-faint); text-transform: none; font-weight: 500; }
 .uso .cheio, .uso-dia .cheio { color: #9a3412; font-weight: 600; }
 .uso-dia span span { color: var(--fg-faint); }
+
+/* ---------- período na lista de agendamentos ---------- */
+.periodo { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem 1.4rem; margin-bottom: 1.2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--line-soft); }
+.periodo .pilulas button { min-height: 40px; padding: .35rem .95rem; font-size: .84rem; }
+.per-nav { margin: 0; }
+.per-nav strong { min-width: 15ch; font-size: 1.3rem; }
+.per-nav input[type="date"] { width: auto; padding: .45rem .7rem; font-size: .84rem; }
+#p-novo { margin-left: auto; }
+tr.dia-sep td { background: color-mix(in srgb, var(--accent) 6%, var(--bg)); padding: .65rem 1rem; border-bottom: 1px solid var(--line); }
+tr.dia-sep.hoje td { background: color-mix(in srgb, var(--gold) 12%, var(--bg)); }
+tr.dia-sep div { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+tr.dia-sep strong { font-family: var(--serif); font-size: 1.15rem; font-weight: 500; text-transform: capitalize; }
+tr.dia-sep small { color: var(--fg-faint); font-size: .74rem; }
+tr.dia-sep .mini { margin-left: auto; }
+td.vazio-dia { color: var(--fg-faint); font-size: .8rem; font-style: italic; padding-block: .7rem; }

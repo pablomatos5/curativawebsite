@@ -10,8 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261003c">
-<link rel="stylesheet" href="app.css?v=20261003c">
+<link rel="stylesheet" href="styles.css?v=20261003d">
+<link rel="stylesheet" href="app.css?v=20261003d">
 </head>
 <body>
 <div class="faixa-demo">Protótipo: sem login real e com dados fictícios. No sistema final, cada funcionário entra com usuário e senha próprios e só vê a sua unidade.</div>
@@ -76,15 +76,29 @@
     </section>
 
     <section class="aba" data-aba="lista" hidden style="background:none">
+      <!-- período: dia, semana, próximos ou tudo; com navegação e atalho para agendar no dia escolhido -->
+      <div class="periodo">
+        <div class="campo"><label for="f-periodo">Período</label>
+          <select id="f-periodo"><option value="dia">Dia</option><option value="semana" selected>Semana</option><option value="proximos">Próximos</option><option value="tudo">Tudo</option></select></div>
+        <div class="dia-nav per-nav" id="per-nav">
+          <button class="mini seta" id="p-ant" aria-label="Anterior"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <strong id="p-txt"></strong>
+          <button class="mini seta" id="p-prox" aria-label="Próximo"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <input type="date" id="p-data" class="ctl" aria-label="Ir para a data">
+          <button class="mini" id="p-hoje">Hoje</button>
+        </div>
+        <button class="btn solid" id="p-novo" style="padding:.75rem 1.2rem">+ Agendar em <span id="p-novo-dia"></span></button>
+      </div>
       <div class="filtros" style="margin-bottom:1rem">
         <div class="campo"><label for="f-tipo">Tipo</label><select id="f-tipo" class="ctl"><option value="">Todos</option><option value="avaliacao">Avaliações</option><option value="procedimento">Procedimentos</option></select></div>
         <div class="campo"><label for="f-status">Status</label><select id="f-status" class="ctl"><option value="">Todos</option></select></div>
         <div class="campo"><label for="f-busca">Buscar</label><input id="f-busca" class="ctl" placeholder="Nome, telefone ou código"></div>
       </div>
       <div class="tabela-wrap"><table>
-        <thead><tr><th>Data</th><th>Hora</th><th>Unidade</th><th>Atendimento</th><th>Profissional</th><th>Cliente</th><th>Status</th><th>Ações</th></tr></thead>
+        <thead><tr><th>Hora</th><th>Unidade</th><th>Atendimento</th><th>Profissional</th><th>Cliente</th><th>Status</th><th>Ações</th></tr></thead>
         <tbody id="t-ag"></tbody>
       </table></div>
+      <p class="aviso" id="per-aviso" hidden>Buscando em todas as datas. Apague a busca para voltar ao período.</p>
     </section>
 
     <section class="aba" data-aba="escalas" hidden style="background:none">
@@ -244,7 +258,7 @@
   </form>
 </dialog>
 
-<script src="app.js?v=20261003c"></script>
-<script src="admin.js?v=20261003c"></script>
+<script src="app.js?v=20261003d"></script>
+<script src="admin.js?v=20261003d"></script>
 </body>
 </html>
