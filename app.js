@@ -123,6 +123,25 @@ const Store = {
   avaliacoesSite(unidade, data) { return this.agendamentos().filter((a) => a.unidade === unidade && a.data === data && a.canal === "site" && a.status !== "cancelado").length; },
   lotado(unidade, data) { const l = this.limiteDia(unidade, data); return l !== null && this.avaliacoesSite(unidade, data) >= l; },
 
+  // Escolha automática do profissional (agendamentos do site), ligada por padrão em cada unidade.
+  autoProfLigado(unidade) { try { return (JSON.parse(localStorage.getItem("curativa.autoprof")) || {})[unidade] !== false; } catch { return true; } },
+  definirAutoProf(unidade, on) { let c = {}; try { c = JSON.parse(localStorage.getItem("curativa.autoprof")) || {}; } catch {} c[unidade] = on; this.gravar("autoprof", c); },
+  // Entre quem pode atender (área, escala, livre e sem descobrir outra avaliação pendente), escolhe:
+  // 1) quem já atendeu a cliente (mesmo celular); 2) quem tem menos atendimentos no dia; 3) o mais especializado.
+  escolherProf(unidade, data, hora, ambito, telefone, ignorar) {
+    const cand = this.candidatos(unidade, data, hora, ambito, ignorar);
+    if (!cand.length) return "";
+    const ag = this.agendamentos().filter((a) => a.id !== ignorar && a.status !== "cancelado");
+    const tel = String(telefone || "").replace(/\D/g, "");
+    if (tel.length >= 10) {
+      const antes = ag.filter((a) => a.prof && String(a.telefone).replace(/\D/g, "") === tel).sort((a, b) => (b.data + b.hora).localeCompare(a.data + a.hora));
+      const conhecido = antes.find((a) => cand.some((p) => p.id === a.prof));
+      if (conhecido) return conhecido.prof;
+    }
+    const carga = (p) => ag.filter((a) => a.prof === p.id && a.data === data).length;
+    return cand.slice().sort((a, b) => carga(a) - carga(b) || a.ambitos.length - b.ambitos.length || a.id.localeCompare(b.id))[0].id;
+  },
+
   // folgas, férias e afastamentos por período: { id, prof, de, ate, motivo }
   bloqueios() { return this.ler("bloqueios"); },
   deFolga(prof, data, bloqueios = this.bloqueios()) { return bloqueios.find((b) => b.prof === prof && b.de <= data && data <= b.ate); },

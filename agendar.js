@@ -112,8 +112,10 @@ btnAvancar.onclick = () => {
   // a vaga pode ter sido tomada enquanto a pessoa preenchia: confere de novo
   if (!Store.livres(estado.unidade, estado.data, estado.ambito)[estado.hora]) { estado.hora = ""; irPara(3); resumo(); return alerta("Esse horário acabou de ser ocupado. Escolha outro."); }
   const ag = {
-    // prof fica vazio: quem define o profissional da avaliação é a secretaria, no painel
-    id: protocolo("AG"), canal: "site", tipo: "avaliacao", ambito: estado.ambito, procedimento: "", unidade: estado.unidade, data: estado.data, hora: estado.hora, prof: "",
+    // profissional escolhido automaticamente (se a unidade usa a escolha automática); a secretaria pode trocar no painel.
+    // Continua "pendente" até a secretaria confirmar com a cliente.
+    id: protocolo("AG"), canal: "site", tipo: "avaliacao", ambito: estado.ambito, procedimento: "", unidade: estado.unidade, data: estado.data, hora: estado.hora,
+    ...(() => { const p = Store.autoProfLigado(estado.unidade) ? Store.escolherProf(estado.unidade, estado.data, estado.hora, estado.ambito, $("#ag-tel").value) : ""; return { prof: p, auto: !!p }; })(),
     nome: $("#ag-nome").value.trim(), telefone: $("#ag-tel").value.trim(), email: $("#ag-email").value.trim(),
     obs: $("#ag-obs").value.trim(), status: "pendente", criado: new Date().toISOString(),
   };

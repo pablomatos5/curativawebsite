@@ -10,8 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261003d">
-<link rel="stylesheet" href="app.css?v=20261003d">
+<link rel="stylesheet" href="styles.css?v=20261003e">
+<link rel="stylesheet" href="app.css?v=20261003e">
 </head>
 <body>
 <div class="faixa-demo">Protótipo: sem login real e com dados fictícios. No sistema final, cada funcionário entra com usuário e senha próprios e só vê a sua unidade.</div>
@@ -125,8 +125,9 @@
 
       <!-- limite de avaliações marcadas pelo site, por unidade e dia da semana -->
       <div class="limites">
-        <h3 class="display">Limite de avaliações <em>pelo site</em></h3>
-        <p class="lead">Quantas avaliações as clientes podem marcar <strong>pelo site</strong> em cada unidade, por dia. Ao chegar no limite, o site para de oferecer horários naquele dia. O que a secretaria marca no painel não conta e não tem limite. Deixe em branco para não limitar.</p>
+        <h3 class="display">Agendamentos <em>pelo site</em></h3>
+        <p class="lead"><strong>Limite por dia:</strong> quantas avaliações as clientes podem marcar pelo site em cada unidade. Ao chegar no limite, o site para de oferecer horários naquele dia. O que a secretaria marca no painel não conta e não tem limite. Deixe em branco para não limitar.</p>
+        <p class="lead"><strong>Profissional automático:</strong> o sistema já escolhe o profissional quando a cliente agenda: quem já a atendeu, senão quem está com a agenda mais leve no dia. A secretaria só confirma, e pode trocar se quiser.</p>
         <div class="tabela-wrap"><table class="tab-lim"><thead id="h-lim"></thead><tbody id="t-lim"></tbody></table></div>
       </div>
     </section>
@@ -258,7 +259,7 @@
   </form>
 </dialog>
 
-<script src="app.js?v=20261003d"></script>
-<script src="admin.js?v=20261003d"></script>
+<script src="app.js?v=20261003e"></script>
+<script src="admin.js?v=20261003e"></script>
 </body>
 </html>

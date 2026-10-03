@@ -59,7 +59,9 @@ const acoesAg = (a) => {
         : "";
       return [sel, remarcar, cancelar].filter(Boolean).join(" ");
     }
-    return [Store.problema(a) ? "" : b("confirmado", "Confirmar"), remarcar, cancelar].filter(Boolean).join(" ");
+    const outros = Store.profsLivres(a.unidade, a.data, a.ambito, a.hora, a.id).filter((p) => p.id !== a.prof);
+    const trocar = outros.length ? `<select class="ctl" data-trocar="${id}" aria-label="Trocar o profissional de ${esc(a.nome)}"><option value="">Trocar profissional…</option>${outros.map((p) => `<option value="${esc(p.id)}">${esc(p.nome)}</option>`).join("")}</select>` : "";
+    return [Store.problema(a) ? "" : b("confirmado", "Confirmar"), trocar, remarcar, cancelar].filter(Boolean).join(" ");
   }
   if (a.status === "confirmado") return [b("concluido", "Concluir"), a.data <= iso(hoje()) ? b("faltou", "Faltou") : "", remarcar, cancelar].filter(Boolean).join(" ");
   if (a.status === "concluido") return marcar;
@@ -114,12 +116,19 @@ document.addEventListener("click", (e) => {
   if (t.closest("[data-fechar]")) t.closest("dialog").close();
 });
 document.addEventListener("change", (e) => {
+  if (e.target.matches("select[data-trocar]") && e.target.value) {
+    const a = agPorId(e.target.dataset.trocar);
+    if (!Store.candidatos(a.unidade, a.data, a.hora, a.ambito, a.id).some((p) => p.id === e.target.value)) { alert("Esse profissional acabou de ser ocupado nesse horário. Escolha outro."); return tudo(); }
+    Store.atualizar("agendamentos", a.id, { prof: e.target.value, auto: false });
+    return tudo();
+  }
   if (e.target.matches("select[data-atribuir]") && e.target.value) {
     const a = agPorId(e.target.dataset.atribuir);
     if (!Store.candidatos(a.unidade, a.data, a.hora, a.ambito, a.id).some((p) => p.id === e.target.value)) { alert("Esse profissional acabou de ser ocupado nesse horário. Escolha outro."); return tudo(); }
     Store.atualizar("agendamentos", a.id, { prof: e.target.value, status: "confirmado" });
     return tudo();
   }
+  if (e.target.matches("input[data-auto]")) { Store.definirAutoProf(e.target.dataset.auto, e.target.checked); return tudo(); }
   if (e.target.matches("input[data-lim]")) {
     const [un, d] = e.target.dataset.lim.split("|"), v = e.target.value.trim();
     Store.definirLimite(un, +d, v === "" ? null : Math.max(0, Math.floor(+v) || 0));
@@ -157,7 +166,7 @@ function kpis(ag, ped) {
 function cartao(a, ver = {}) {
   const prob = Store.problema(a);
   const det = (ver.unidade ? tagUn(a.unidade) + " " : "") + [rotuloAg(a), ver.prof !== false && Store.nomeProf(a.prof), a.telefone, a.obs].filter(Boolean).map(esc).join(" · ");
-  const hist = [a.status === "cancelado" && a.motivo && "Motivo: " + a.motivo, a.antes && "Remarcado · antes " + a.antes, a.remarcadoDe && "Nova data depois de uma falta"]
+  const hist = [a.auto && a.prof && "Profissional definido automaticamente", a.status === "cancelado" && a.motivo && "Motivo: " + a.motivo, a.antes && "Remarcado · antes " + a.antes, a.remarcadoDe && "Nova data depois de uma falta"]
     .filter(Boolean).map(esc).join(" · ");
   return `<div class="marcado st-${a.status}${a.tipo === "procedimento" ? " proc" : ""}${prob ? " atencao" : ""}">
     <div><strong>${esc(a.nome)}</strong> <span class="selo ${a.status}">${STATUS_AG[a.status]}</span>${prob ? ` <span class="selo atencao">${esc(prob)}</span>` : ""}
@@ -253,7 +262,7 @@ function lista(ag) {
   // na semana e no dia, mostra também os dias sem nada (com o atalho para agendar)
   const p = $("#f-periodo").value, dias = !q && p === "semana" ? [0, 1, 2, 3, 4, 5].map((i) => iso(addDias(new Date(segundaDe(pData) + "T12:00"), i))) : !q && p === "dia" ? [pData] : [...new Set(rows.map((a) => a.data))];
   const linha = (a) => `<tr>
-    <td>${a.hora}</td><td>${tagUn(a.unidade)}</td><td>${esc(rotuloAg(a))}</td><td>${esc(Store.nomeProf(a.prof))}</td>
+    <td>${a.hora}</td><td>${tagUn(a.unidade)}</td><td>${esc(rotuloAg(a))}</td><td>${esc(Store.nomeProf(a.prof))}${a.auto && a.prof ? `<br><small class="auto-tag">automático</small>` : ""}</td>
     <td>${esc(a.nome)}<br><small style="color:var(--fg-faint)">${esc(a.telefone)} · <code>${esc(a.id)}</code></small></td>
     <td><span class="selo ${a.status}">${STATUS_AG[a.status]}</span>${Store.problema(a) ? `<br><span class="selo atencao" style="margin-top:.3rem">${esc(Store.problema(a))}</span>` : ""}${a.status === "cancelado" && a.motivo ? `<br><small style="color:var(--fg-faint)">${esc(a.motivo)}</small>` : ""}</td>
     <td><div class="acoes-ag">${acoesAg(a)}</div></td></tr>`;
@@ -443,10 +452,11 @@ function usoTxt(u, data, curto) {
 // tabela de limites: uma linha por unidade (ou só a escolhida), uma coluna por dia da semana
 function limitesTab() {
   const uns = UNIDADES.filter((x) => x.clinica && (!unidadeSel() || x.id === unidadeSel()));
-  $("#h-lim").innerHTML = `<tr><th>Unidade</th>${[1, 2, 3, 4, 5, 6].map((d) => `<th>${DIAS[d]}</th>`).join("")}</tr>`;
+  $("#h-lim").innerHTML = `<tr><th>Unidade</th>${[1, 2, 3, 4, 5, 6].map((d) => `<th>${DIAS[d]}</th>`).join("")}<th>Profissional automático</th></tr>`;
   $("#t-lim").innerHTML = uns.map((x) => {
     const l = Store.limites()[x.id] || {};
-    return `<tr><td>${tagUn(x.id)}</td>${[1, 2, 3, 4, 5, 6].map((d) => `<td><input class="ctl" type="number" min="0" max="99" step="1" placeholder="—" value="${Number.isInteger(l[d]) ? l[d] : ""}" data-lim="${x.id}|${d}" aria-label="Limite de avaliações pelo site em ${esc(x.nome)}, ${DIAS[d]}"></td>`).join("")}</tr>`;
+    return `<tr><td>${tagUn(x.id)}</td>${[1, 2, 3, 4, 5, 6].map((d) => `<td><input class="ctl" type="number" min="0" max="99" step="1" placeholder="—" value="${Number.isInteger(l[d]) ? l[d] : ""}" data-lim="${x.id}|${d}" aria-label="Limite de avaliações pelo site em ${esc(x.nome)}, ${DIAS[d]}"></td>`).join("")}
+      <td><label class="chave"><input type="checkbox" data-auto="${x.id}"${Store.autoProfLigado(x.id) ? " checked" : ""}><span>${Store.autoProfLigado(x.id) ? "Ligado" : "Desligado"}</span></label></td></tr>`;
   }).join("");
 }
 
@@ -490,8 +500,11 @@ function oQue(ambitoPref) {
 }
 const ambitoNovo = () => ($("#n-tipo").value === "procedimento" ? acha(PROCEDIMENTOS, $("#n-oque").value).ambito : $("#n-oque").value);
 function quemAtende() {
-  const lista = $("#n-data").value ? Store.emEscala($("#n-unidade").value, $("#n-data").value, ambitoNovo()) : [];
-  $("#n-prof").innerHTML = lista.map(({ prof }) => `<option value="${esc(prof.id)}">${esc(prof.nome)}</option>`).join("");
+  const d = $("#n-data").value, ag = Store.agendamentos();
+  // sugestão: quem está com menos atendimentos no dia vem primeiro (e já selecionado)
+  const carga = (p) => ag.filter((a) => a.prof === p.id && a.data === d && a.status !== "cancelado").length;
+  const lista = (d ? Store.emEscala($("#n-unidade").value, d, ambitoNovo()) : []).sort((x, y) => carga(x.prof) - carga(y.prof));
+  $("#n-prof").innerHTML = lista.map(({ prof }, i) => `<option value="${esc(prof.id)}">${esc(prof.nome)}${i === 0 && lista.length > 1 ? " · sugerido" : ""} (${carga(prof)} no dia)</option>`).join("");
   $("#n-prof-erro").textContent = lista.length ? "" : "Ninguém dessa área está escalado nesse dia nesta unidade. Mude a data, a unidade ou ajuste a escala.";
   horasLivres();
 }

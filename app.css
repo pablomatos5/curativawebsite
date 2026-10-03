@@ -389,3 +389,13 @@ tr.dia-sep strong { font-family: var(--serif); font-size: 1.15rem; font-weight: 
 tr.dia-sep small { color: var(--fg-faint); font-size: .74rem; }
 tr.dia-sep .mini { margin-left: auto; }
 td.vazio-dia { color: var(--fg-faint); font-size: .8rem; font-style: italic; padding-block: .7rem; }
+
+/* ---------- profissional automático ---------- */
+.auto-tag { font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; color: var(--gold); }
+.chave { display: inline-flex; align-items: center; gap: .55rem; cursor: pointer; font-size: .8rem; color: var(--fg-muted); white-space: nowrap; }
+.chave input { appearance: none; -webkit-appearance: none; width: 2.4rem; height: 1.35rem; border-radius: 100px; background: var(--line); position: relative; cursor: pointer; transition: background .25s; margin: 0; flex: none; }
+.chave input::after { content: ""; position: absolute; top: 3px; left: 3px; width: calc(1.35rem - 6px); height: calc(1.35rem - 6px); border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: translate .25s var(--ease); }
+.chave input:checked { background: var(--accent); }
+.chave input:checked::after { translate: 1.05rem 0; }
+.chave input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tab-lim { min-width: 780px; }
