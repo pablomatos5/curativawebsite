@@ -122,7 +122,7 @@ h3.display { font-size: 1.65rem; line-height: 1.1; }
 .nav ul a::after { content: ""; position: absolute; left: 0; bottom: -5px; height: 1px; width: 0; background: var(--accent); transition: width .35s; }
 .nav ul a:hover { color: var(--fg); } .nav ul a:hover::after { width: 100%; }
 .nav .btn { padding: .7rem 1.3rem; font-size: .62rem; }
-@media (max-width: 900px) { .nav ul { display: none; } }
+@media (max-width: 1080px) { .nav ul { display: none; } }
 @media (max-width: 520px) { .nav .btn { padding: .55rem .9rem; font-size: .56rem; white-space: nowrap; } .brand b { font-size: 1.05rem; letter-spacing: .16em; } .brand small { display: none; } }
 
 /* ---------- hero ---------- */
@@ -416,9 +416,9 @@ footer a:hover { color: #faf6ee; }
   .hero-stats { gap: 1.4rem 2rem; }
 }
 
-/* menu no celular: botão de três riscos abre um painel com os links */
+/* menu no celular (e tablet): botão de três riscos abre um painel com os links */
 .menu-btn, .so-cel { display: none; }
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .menu-btn { all: unset; box-sizing: border-box; order: 3; width: 44px; height: 44px; display: grid; place-content: center; gap: 5px; cursor: pointer; border-radius: 50%; }
   .menu-btn span { display: block; width: 20px; height: 1.5px; background: var(--fg); transition: rotate .4s var(--ease), translate .4s var(--ease), opacity .3s; }
   .menu-btn:focus-visible { outline: 2px solid var(--accent); }
@@ -552,3 +552,16 @@ main > section.theme-verde::before { opacity: .2; }
 @media (max-width: 1023px) { .flips.flips-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .flip-f .capa * { animation: none !important; stroke-dashoffset: 0 !important; opacity: 1; }
 .flip-f .capa .fino { opacity: .7; }
+
+/* atalho "Produtos" no topo, ao lado do agendar */
+.nav-acoes { display: flex; align-items: center; gap: .6rem; }
+.nav .nav-loja { display: inline-flex; align-items: center; gap: .5rem; }
+.nav .nav-loja svg { flex: none; margin-top: -2px; }
+@media (max-width: 520px) { .nav .nav-loja { padding: .55rem; width: 2.4rem; height: 2.4rem; justify-content: center; box-sizing: border-box; } .nav .nav-loja span { display: none; } }
+/* telas intermediárias: menu mais compacto e "Produtos" só com o ícone da sacola, para tudo caber numa linha */
+.nav ul a { white-space: nowrap; }
+@media (max-width: 1500px) and (min-width: 1081px) {
+  .nav ul { gap: 1.2rem; } .nav ul a { letter-spacing: .12em; }
+  .nav .nav-loja { width: 2.6rem; height: 2.6rem; padding: 0; justify-content: center; box-sizing: border-box; } .nav .nav-loja span { display: none; }
+}
+@media (max-width: 1200px) and (min-width: 1081px) { .nav ul { gap: .95rem; } .nav .so-desk { display: none; } }
