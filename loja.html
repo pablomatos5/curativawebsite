@@ -26,7 +26,7 @@
   <div class="wrap">
     <span class="eyebrow">Pronta entrega</span>
     <h1 class="display">Compre e <em>retire na unidade.</em></h1>
-    <p class="lead">Produtos da linha Curativa já prontos. Escolha onde quer retirar, monte a sacola e pague na retirada.</p>
+    <p class="lead">Produtos da linha Curativa já prontos. Escolha onde quer retirar, monte a sacola e pague por Pix ou cartão. Depois é só buscar na unidade.</p>
 
     <div class="loja-barra">
       <div class="campo" style="min-width:220px"><label for="retirada">Retirar em</label><select id="retirada"></select></div>
@@ -48,16 +48,12 @@
       <div class="campos">
         <div class="campo full"><label for="lj-nome">Nome completo</label><input id="lj-nome" autocomplete="name" required><span class="erro"></span></div>
         <div class="campo full"><label for="lj-tel">Celular com WhatsApp</label><input id="lj-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(91) 90000-0000" aria-describedby="lj-tel-dica" required><span class="dica" id="lj-tel-dica">É por ele que avisamos quando o pedido estiver pronto para retirar.</span><span class="erro"></span></div>
-        <fieldset class="campo full forma-pag" style="border:0">
-          <legend class="rotulo" style="margin-bottom:.5rem">Pagamento</legend>
-          <label class="opcao"><input type="radio" name="forma" value="online" checked><span>Pagar agora<small>Pix ou cartão de crédito, aqui no site</small></span></label>
-          <label class="opcao"><input type="radio" name="forma" value="retirada"><span>Pagar na retirada<small>Na unidade, quando buscar o pedido</small></span></label>
-        </fieldset>
+        <p class="campo full pag-info"><span class="rotulo">Pagamento</span> Pix ou cartão de crédito, na próxima etapa. O pedido é confirmado assim que o pagamento é aprovado.</p>
         <label class="aceite full"><input type="checkbox" id="lj-aceite" required> Autorizo a Curativa a usar estes dados para separar meu pedido e avisar quando estiver pronto.</label>
       </div>
       <span class="erro" id="lj-erro" role="alert" style="font-size:.74rem;color:#b3261e;display:block;min-height:1.2em;margin-top:.5rem"></span>
       <p class="aviso" id="lj-onde"></p>
-      <div class="acoes"><button class="btn" type="button" data-fechar>Continuar comprando</button><button class="btn solid" type="submit" id="lj-finalizar">Finalizar pedido</button></div>
+      <div class="acoes"><button class="btn" type="button" data-fechar>Continuar comprando</button><button class="btn solid" type="submit" id="lj-finalizar">Ir para o pagamento</button></div>
     </form>
   </div>
   <div id="sacola-feito" class="feito" hidden>

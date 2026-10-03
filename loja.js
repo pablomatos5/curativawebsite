@@ -1,5 +1,5 @@
 // Loja de pronta entrega: escolhe a unidade de retirada, monta a sacola e faz o pedido.
-// Pagamento: online (pagamento.html, Pix ou cartão via Mercado Pago) ou na retirada.
+// Pagamento sempre no ato da compra: a sacola segue para pagamento.html (Pix ou cartão via Mercado Pago).
 // Cartão de produto no padrão da referência: barra "adicionar" que sobe no hover, zoom lento, tilt com brilho, toast.
 Store.semear();
 const $ = (s) => document.querySelector(s);
@@ -92,10 +92,7 @@ function desenharSacola() {
   $("#sacola-total").textContent = brl(sacola.reduce((s, i) => s + acha(PRODUTOS, i.id).preco * i.qtd, 0));
   $("#lj-onde").textContent = `Retirada na unidade de ${nomeUnidade(unidade)}. A equipe avisa pelo WhatsApp quando o pedido estiver separado.`;
   $("#lj-finalizar").disabled = !sacola.length;
-  $("#lj-finalizar").textContent = formaPag() === "online" ? "Ir para o pagamento" : "Finalizar pedido";
 }
-const formaPag = () => (document.querySelector('input[name="forma"]:checked') || {}).value || "online";
-document.querySelectorAll('input[name="forma"]').forEach((r) => (r.onchange = desenharSacola));
 const tudo = () => { salvar(); grade(); desenharSacola(); };
 
 function adicionar(id, variante = "") {
@@ -167,22 +164,15 @@ $("#form-loja").addEventListener("submit", (e) => {
   const itens = sacola.map((i) => ({ id: i.id, nome: nomeProduto(i.id), variante: i.variante, qtd: i.qtd, preco: acha(PRODUTOS, i.id).preco }));
   const pedido = { id: protocolo("LJ"), tipo: "loja", unidade, itens, total: Math.round(itens.reduce((s, i) => s + i.preco * i.qtd, 0) * 100) / 100, entrega: "retirada", arquivo: "", obs: "",
     nome: $("#lj-nome").value.trim(), telefone: $("#lj-tel").value.trim(), status: "recebido", criado: new Date().toISOString(),
-    pagamento: formaPag() === "online" ? { forma: "online", status: "aguardando" } : { forma: "retirada", status: "na-retirada" } };
+    pagamento: { forma: "online", status: "aguardando" } };
   Store.add("pedidos", pedido);
   Store.moverEstoque(itens, unidade, -1);   // reserva os itens
   sacola = []; tudo();
-  // pagar agora: segue para a página de pagamento do próprio site (o pedido já está reservado)
-  if (pedido.pagamento.forma === "online") { location.href = "pagamento.html?pedido=" + encodeURIComponent(pedido.id); return; }
-  confirmado(pedido);
+  // segue para a página de pagamento do próprio site (os itens ficam reservados enquanto ela paga)
+  location.href = "pagamento.html?pedido=" + encodeURIComponent(pedido.id);
 });
-function confirmado(pedido) {
-  $("#lj-quem").textContent = pedido.nome.split(" ")[0] + "."; $("#lj-cod").textContent = pedido.id;
-  $("#lj-texto").textContent = `Seu pedido de ${brl(pedido.total)} foi reservado na unidade de ${nomeUnidade(pedido.unidade)}. Pagamento na retirada. A equipe avisa pelo WhatsApp quando estiver separado.`;
-  $("#sacola-corpo").hidden = true; $("#sacola-feito").hidden = false;
-}
 
 if (ajustarAoEstoque()) salvar();
 tudo();
-// voltou da página de pagamento escolhendo pagar na retirada: mostra a confirmação do pedido
-const voltou = Store.pedidos().find((p) => p.id === new URLSearchParams(location.search).get("pedido") && p.tipo === "loja");
-if (voltou) { abrirSacola(); confirmado(voltou); history.replaceState(null, "", "loja.html"); }
+// voltou da página de pagamento desistindo da compra: avisa que o pedido foi cancelado
+if (new URLSearchParams(location.search).get("desistiu")) { toast("Pedido cancelado. Os itens voltaram para a loja."); history.replaceState(null, "", "loja.html"); }

@@ -216,12 +216,14 @@ function mostrarPago(pag) {
   f.focus();
 }
 
-// desistir do pagamento online: o pedido continua reservado, e paga na unidade
-$("#na-retirada").onclick = () => {
-  if (!confirm("Seu pedido continua reservado e você paga na unidade, na hora da retirada. Confirmar?")) return;
+// desistir: o pagamento é no ato da compra, então sem pagamento o pedido é cancelado e os itens voltam ao estoque
+$("#desistir").onclick = () => {
+  if (!confirm("Cancelar este pedido? Os itens voltam para a loja e nada é cobrado.")) return;
   clearInterval(espera);
-  Store.atualizar("pedidos", pedido.id, { pagamento: { forma: "retirada", status: "na-retirada" } });
-  location.href = "loja.html?pedido=" + encodeURIComponent(pedido.id);
+  const atual = Store.pedidos().find((p) => p.id === pedido.id);
+  if (atual.status !== "cancelado") Store.moverEstoque(atual.itens, atual.unidade, +1);
+  Store.atualizar("pedidos", pedido.id, { status: "cancelado", pagamento: { ...(atual.pagamento || {}), status: "desistiu" } });
+  location.href = "loja.html?desistiu=1";
 };
 
 iniciar();

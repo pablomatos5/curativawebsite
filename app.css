@@ -348,3 +348,5 @@ td select.ctl { padding-right: 2rem; background-position: right .5rem center; ba
 @media (max-width: 600px) { .opcoes.vale { grid-template-columns: 1fr; } }
 
 .matriz td, .matriz th { padding-inline: .6rem; }
+.pag-info { font-size: .84rem; color: var(--fg-muted); line-height: 1.55; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.pag-info .rotulo { display: block; margin-bottom: .2rem; }

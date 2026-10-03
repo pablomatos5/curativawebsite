@@ -320,6 +320,7 @@ function pagamentoTxt(p) {
   if (!g || g.forma === "retirada") return `<span class="selo">Na retirada</span>`;
   if (g.status === "aprovado") return `<span class="selo concluido">Pago</span><br><small style="color:var(--fg-faint)">${g.metodo === "pix" ? "Pix" : `Cartão${g.final ? " final " + esc(g.final) : ""}${g.parcelas > 1 ? " · " + g.parcelas + "x" : ""}`}${g.demo ? " · simulado" : ""}</small>`;
   if (g.status === "analise") return `<span class="selo pendente">Em análise</span>`;
+  if (g.status === "desistiu") return `<span class="selo cancelado">Não pago</span><br><small style="color:var(--fg-faint)">cliente desistiu</small>`;
   if (g.status === "recusado") return `<span class="selo cancelado">Recusado</span><br><small style="color:var(--fg-faint)">cliente pode tentar de novo</small>`;
   return `<span class="selo pendente">Aguardando pagamento</span>`;
 }
