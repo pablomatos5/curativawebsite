@@ -2,6 +2,7 @@
 // Pagamento sempre no ato da compra: a sacola segue para pagamento.html (Pix ou cartão via Mercado Pago).
 // Cartão de produto no padrão da referência: barra "adicionar" que sobe no hover, zoom lento, tilt com brilho, toast.
 Store.semear();
+Store.expirarPedidos();
 const $ = (s) => document.querySelector(s);
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const lojas = UNIDADES.filter((u) => u.farmacia);
@@ -149,7 +150,7 @@ document.addEventListener("click", (e) => {
   if (t.closest("[data-ver-sacola]")) return abrirSacola();
   if (t.closest("[data-fechar]")) t.closest("dialog").close();
 });
-function abrirSacola() { $("#toast").classList.remove("show"); $("#sacola-corpo").hidden = false; $("#sacola-feito").hidden = true; $("#lj-erro").textContent = ""; desenharSacola(); $("#sacola").showModal(); }
+function abrirSacola() { $("#toast").classList.remove("show"); $("#sacola-corpo").hidden = false; $("#lj-erro").textContent = ""; desenharSacola(); $("#sacola").showModal(); }
 $("#abrir-sacola").onclick = abrirSacola;
 
 const campoErro = (el, msg) => { el.closest(".campo").querySelector(".erro").textContent = msg; el.setAttribute("aria-invalid", !!msg); return !msg; };

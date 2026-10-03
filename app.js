@@ -108,6 +108,19 @@ const Store = {
   remover(k, id) { this.gravar(k, this.ler(k).filter((x) => x.id !== id)); },
   nomeProf(id) { return acha(this.profissionais(), id).nome || "A definir"; },
 
+  // Pedido da loja que ficou sem pagamento (a cliente fechou a página) expira depois de 40 minutos e devolve os
+  // itens ao estoque. 40 min cobre os 30 do Pix; um Pix ainda válido segura o pedido até vencer.
+  expirarPedidos(minutos = 40) {
+    const limite = Date.now() - minutos * 60000;
+    for (const p of this.pedidos()) {
+      const g = p.pagamento || {};
+      if (p.tipo !== "loja" || p.status === "cancelado" || !["aguardando", "recusado"].includes(g.status)) continue;
+      if (new Date(p.criado).getTime() > limite || (g.pix && new Date(g.pix.expira).getTime() > Date.now())) continue;
+      this.moverEstoque(p.itens, p.unidade, +1);
+      this.atualizar("pedidos", p.id, { status: "cancelado", pagamento: { ...g, status: "expirado" } });
+    }
+  },
+
   // estoque por produto e unidade: { mist: { cameta: 6, abaetetuba: 8 }, ... }
   estoque() { try { return JSON.parse(localStorage.getItem("curativa.estoque")) || {}; } catch { return {}; } },
   disponivel(id, unidade) { return (this.estoque()[id] || {})[unidade] || 0; },

@@ -15,7 +15,14 @@ const campoErro = (el, msg) => { el.closest(".campo").querySelector(".erro").tex
 
 // ---------- início ----------
 async function iniciar() {
+  Store.expirarPedidos();
+  const atual = pedido && Store.pedidos().find((p) => p.id === pedido.id);
   if (!pedido) { $("#sem-pedido").hidden = false; return; }
+  if (atual.status === "cancelado") {
+    $("#sem-pedido").querySelector(".lead").textContent = atual.pagamento?.status === "expirado" ? "Este pedido expirou porque o pagamento não foi concluído." : "Este pedido foi cancelado.";
+    $("#sem-pedido").querySelector(".aviso").textContent = "Os itens voltaram para a loja. Monte a sacola de novo para comprar.";
+    $("#sem-pedido").hidden = false; return;
+  }
   if (pedido.pagamento?.status === "aprovado") return mostrarPago(pedido.pagamento);
   $("#checkout").hidden = false;
   $("#pg-itens").innerHTML = pedido.itens.map((it) => `<li><span>${it.qtd}× ${esc(it.nome)}${it.variante ? ` <small>${esc(it.variante)}</small>` : ""}</span><b>${brl(it.preco * it.qtd)}</b></li>`).join("");
