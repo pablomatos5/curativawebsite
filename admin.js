@@ -16,14 +16,23 @@ $("#sair").onclick = () => { try { sessionStorage.removeItem("curativa.adm"); } 
 
 // ---------- filtros e abas ----------
 const optUnidades = UNIDADES.map((u) => `<option value="${u.id}">${u.nome}</option>`).join("");
+// unidade: pílulas coloridas no topo (o <select> continua por baixo). Lembra a última escolha neste aparelho;
+// no sistema real, a unidade vem do login de cada funcionário.
 $("#f-unidade").innerHTML = `<option value="">Todas</option>` + optUnidades;
-$("#f-unidade").value = "cameta";
+$("#f-unidade").dataset.cores = ["#8f958c", ...UNIDADES.map((u) => u.cor)].join(",");
+$("#f-unidade").value = (() => { try { const v = localStorage.getItem("curativa.adm.unidade"); return v !== null && (v === "" || UNIDADES.some((u) => u.id === v)) ? v : "cameta"; } catch { return "cameta"; } })();
+pilulas($("#f-unidade"));
+$("#f-unidade").addEventListener("change", () => { try { localStorage.setItem("curativa.adm.unidade", unidadeSel()); } catch {} });
+const corUn = (id) => acha(UNIDADES, id).cor || "#8f958c";
+// etiqueta colorida com o nome da unidade (aparece na visão "Todas")
+const tagUn = (id) => `<span class="un-tag" style="--c:${corUn(id)}">${esc(nomeUnidade(id))}</span>`;
 $("#f-status").innerHTML += Object.entries(STATUS_AG).map(([k, v]) => `<option value="${k}">${v}</option>`).join("") + `<option value="atencao">Precisam de atenção</option>`;
 ["#f-unidade", "#f-status", "#f-tipo"].forEach((s) => ($(s).onchange = tudo));
 $("#f-busca").oninput = tudo;
 const unidadeSel = () => $("#f-unidade").value;
 const filtroUnidade = (x) => !unidadeSel() || x.unidade === unidadeSel();
 const abrirAba = (nome) => {
+  if ($(`.abas button[data-aba="${nome}"]`).hidden) nome = "agenda"; // aba escondida (unidade sem farmácia) não abre
   $$(".abas button").forEach((x) => x.setAttribute("aria-selected", x.dataset.aba === nome));
   $$(".aba").forEach((s) => (s.hidden = s.dataset.aba !== nome));
 };
@@ -140,7 +149,7 @@ function kpis(ag, ped) {
 // card de um atendimento; `ver` diz o que mostrar na linha de detalhes (na agenda por coluna o profissional já está no topo)
 function cartao(a, ver = {}) {
   const prob = Store.problema(a);
-  const det = [rotuloAg(a), ver.prof !== false && Store.nomeProf(a.prof), ver.unidade && nomeUnidade(a.unidade), a.telefone, a.obs].filter(Boolean).map(esc).join(" · ");
+  const det = (ver.unidade ? tagUn(a.unidade) + " " : "") + [rotuloAg(a), ver.prof !== false && Store.nomeProf(a.prof), a.telefone, a.obs].filter(Boolean).map(esc).join(" · ");
   const hist = [a.status === "cancelado" && a.motivo && "Motivo: " + a.motivo, a.antes && "Remarcado · antes " + a.antes, a.remarcadoDe && "Nova data depois de uma falta"]
     .filter(Boolean).map(esc).join(" · ");
   return `<div class="marcado st-${a.status}${a.tipo === "procedimento" ? " proc" : ""}${prob ? " atencao" : ""}">
@@ -197,7 +206,7 @@ function lista(ag) {
     .filter((a) => !q || [a.nome, a.telefone, a.id].some((v) => String(v).toLowerCase().includes(q)))
     .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
   $("#t-ag").innerHTML = rows.length ? rows.map((a) => `<tr>
-    <td>${dataBR(a.data)}</td><td>${a.hora}</td><td>${esc(nomeUnidade(a.unidade))}</td><td>${esc(rotuloAg(a))}</td><td>${esc(Store.nomeProf(a.prof))}</td>
+    <td>${dataBR(a.data)}</td><td>${a.hora}</td><td>${tagUn(a.unidade)}</td><td>${esc(rotuloAg(a))}</td><td>${esc(Store.nomeProf(a.prof))}</td>
     <td>${esc(a.nome)}<br><small style="color:var(--fg-faint)">${esc(a.telefone)} · <code>${esc(a.id)}</code></small></td>
     <td><span class="selo ${a.status}">${STATUS_AG[a.status]}</span>${Store.problema(a) ? `<br><span class="selo atencao" style="margin-top:.3rem">${esc(Store.problema(a))}</span>` : ""}${a.status === "cancelado" && a.motivo ? `<br><small style="color:var(--fg-faint)">${esc(a.motivo)}</small>` : ""}</td>
     <td><div class="acoes-ag">${acoesAg(a)}</div></td></tr>`).join("")
@@ -223,7 +232,7 @@ function escalas() {
       const doDia = todas.filter((e) => e.prof === p.id && e.dias.includes(numDia(data)) && (!e.de || data >= e.de) && (!e.ate || data <= e.ate))
         .sort((a, b) => a.inicio.localeCompare(b.inicio));
       return doDia.map((e) => {
-        const onde = u ? "" : `<small>${esc(nomeUnidade(e.unidade))}</small>`;
+        const onde = u ? "" : `<small class="un-ponto" style="--c:${corUn(e.unidade)}">${esc(nomeUnidade(e.unidade))}</small>`;
         if ((e.folgas || []).includes(data))
           return `<span class="turno off">Folga<small>${e.inicio}–${e.fim}</small>${passado ? "" : `<button data-volta="${esc(e.id)}|${data}" aria-label="Devolver o turno de ${esc(p.nome)} em ${curta(data)}" title="Devolver o turno">↺</button>`}</span>`;
         return `<span class="turno${e.ate ? " temp" : ""}">${e.inicio}–${e.fim}${onde}${e.ate ? `<small>até ${curta(e.ate)}</small>` : ""}${passado ? "" : `<button data-rem-esc="${esc(e.id)}" data-data="${data}" aria-label="Tirar o turno de ${esc(p.nome)} em ${curta(data)}">×</button>`}</span>`;
@@ -327,7 +336,7 @@ function pagamentoTxt(p) {
 function pedidos(ped) {
   const rows = ped.slice().sort((a, b) => b.criado.localeCompare(a.criado));
   $("#t-ped").innerHTML = rows.length ? rows.map((p) => `<tr>
-    <td>${new Date(p.criado).toLocaleDateString("pt-BR")}</td><td>${esc(nomeUnidade(p.unidade))}</td>
+    <td>${new Date(p.criado).toLocaleDateString("pt-BR")}</td><td>${tagUn(p.unidade)}</td>
     <td>${esc(p.nome)}<br><small style="color:var(--fg-faint)">${esc(p.telefone)}</small></td>
     <td>${p.tipo === "loja" ? "Loja" : p.tipo === "formula" ? "Fórmula" : "Produto"}</td>
     <td>${p.tipo === "loja" ? p.itens.map((it) => `${it.qtd}× ${esc(it.nome)}${it.variante ? " (" + esc(it.variante) + ")" : ""}`).join("<br>") + `<br><strong>${brl(p.total)}</strong>` : ""}${p.arquivo ? "📎 " + esc(p.arquivo) : ""}${p.tipo === "formula" ? `<br><small class="selo atencao" style="margin-top:.3rem">Exigir receita original ${p.entrega === "entrega" ? "na entrega" : "na retirada"}</small>` : ""}${p.obs ? `<br><small style="color:var(--fg-faint)">${esc(p.obs)}</small>` : ""}</td>
@@ -337,7 +346,7 @@ function pedidos(ped) {
 }
 
 function estoqueTab() {
-  const lojas = UNIDADES.filter((u) => u.farmacia);
+  const lojas = UNIDADES.filter((u) => u.farmacia && (!unidadeSel() || u.id === unidadeSel()));
   $("#h-est").innerHTML = `<tr><th>Produto</th><th>Preço</th>${lojas.map((u) => `<th>${u.nome}</th>`).join("")}</tr>`;
   $("#t-est").innerHTML = PRODUTOS.map((p) => `<tr><td><strong>${esc(p.nome)}</strong><br><small style="color:var(--fg-faint)">${esc(p.cat)}</small></td><td>${brl(p.preco)}</td>
     ${lojas.map((u) => `<td><input class="ctl" type="number" min="0" step="1" style="width:5.5rem" value="${Store.disponivel(p.id, u.id)}" data-est="${p.id}|${u.id}" aria-label="Estoque de ${esc(p.nome)} em ${u.nome}"></td>`).join("")}</tr>`).join("");
@@ -353,10 +362,32 @@ function atencao(ag) {
     <small>${Object.entries(porTipo).map(([p, n]) => `${esc(p)}: ${n}`).join(" · ")}</small></div><button class="mini" id="ver-atencao">Ver lista</button>`;
 }
 
+// título, subtítulo, cor da faixa e abas conforme a unidade escolhida
+function cabecalhoUnidade() {
+  const u = unidadeSel(), un = acha(UNIDADES, u), h = new Date().getHours();
+  const ola = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
+  $("#saudacao").innerHTML = u ? `${ola}, equipe de <em>${esc(un.nome)}.</em>` : `${ola}, <em>equipe.</em>`;
+  $("#un-sub").innerHTML = u ? `${esc(un.end)} · ${un.farmacia ? "Clínica e farmácia" : "Só clínica (sem farmácia nesta unidade)"}` : `Visão geral das ${UNIDADES.length} unidades. Cada item mostra de qual unidade é.`;
+  $("#painel").style.setProperty("--un", corUn(u));
+  // unidade sem farmácia: as abas de pedidos e estoque somem
+  const farm = !u || un.farmacia;
+  ["pedidos", "estoque"].forEach((a) => ($(`.abas button[data-aba="${a}"]`).hidden = !farm));
+  if (!farm && ["pedidos", "estoque"].includes($('.abas button[aria-selected="true"]').dataset.aba)) abrirAba("agenda");
+  // contador de pendências em cada pílula: avaliações a confirmar, atendimentos a remarcar e pedidos em aberto
+  const ag = Store.agendamentos(), ped = Store.pedidos();
+  const pend = (id) => ag.filter((a) => (!id || a.unidade === id) && ((a.status === "pendente" && a.tipo !== "procedimento") || Store.problema(a))).length
+    + ped.filter((p) => (!id || p.unidade === id) && !["entregue", "cancelado"].includes(p.status)).length;
+  document.querySelectorAll(".unid-bar .pilulas button").forEach((b) => {
+    const n = pend(b.dataset.v);
+    b.querySelector(".cont")?.remove();
+    if (n) b.insertAdjacentHTML("beforeend", `<span class="cont" aria-label="${n} pendência${n > 1 ? "s" : ""}">${n}</span>`);
+  });
+}
+
 function tudo() {
   const ag = Store.agendamentos().filter(filtroUnidade);
   const ped = Store.pedidos().filter(filtroUnidade);
-  atencao(ag); kpis(ag, ped); agenda(ag); lista(ag); escalas(); pedidos(ped); estoqueTab();
+  cabecalhoUnidade(); atencao(ag); kpis(ag, ped); agenda(ag); lista(ag); escalas(); pedidos(ped); estoqueTab();
 }
 
 $("#d-ant").onclick = () => { dia = iso(addDias(new Date(dia + "T12:00"), -1)); tudo(); };
@@ -553,7 +584,7 @@ $("#exportar").onclick = () => {
   const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const linhas = Store.agendamentos().filter(filtroUnidade).map((a) => [a.id, a.tipo || "avaliacao", rotuloAg(a), dataBR(a.data), a.hora, nomeUnidade(a.unidade), Store.nomeProf(a.prof), a.nome, a.telefone, STATUS_AG[a.status], a.status === "cancelado" ? a.motivo : ""].map(q).join(";"));
   const blob = new Blob(["﻿" + [cab.join(";"), ...linhas].join("\n")], { type: "text/csv;charset=utf-8" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "agendamentos-curativa.csv"; a.click(); URL.revokeObjectURL(a.href);
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `agendamentos-curativa-${unidadeSel() || "todas"}.csv`; a.click(); URL.revokeObjectURL(a.href);
 };
 
 // se outra aba (o site) gravar algo, o painel atualiza sozinho

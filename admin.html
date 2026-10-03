@@ -30,13 +30,19 @@
 
   <div class="wrap" id="painel" hidden style="padding-top:2.5rem">
     <div class="adm-top">
-      <div><span class="eyebrow">Painel</span><h1 class="display" style="font-size:clamp(2rem,4vw,3rem);margin:.6rem 0 0">Bom dia, <em>equipe.</em></h1></div>
+      <div><span class="eyebrow">Painel</span><h1 class="display" id="saudacao" style="font-size:clamp(2rem,4vw,3rem);margin:.6rem 0 0">Bom dia, <em>equipe.</em></h1>
+        <p class="un-sub" id="un-sub"></p></div>
       <div class="filtros">
-        <div class="campo"><label for="f-unidade">Unidade</label><select id="f-unidade" class="ctl"></select></div>
         <button class="btn solid" id="novo-ag" style="padding:.75rem 1.2rem">+ Novo agendamento</button>
         <button class="mini" id="exportar">Exportar CSV</button>
         <button class="mini perigo" id="resetar">Restaurar exemplo</button>
       </div>
+    </div>
+
+    <!-- unidade em destaque: tudo abaixo (números, agenda, escalas, pedidos e estoque) segue a unidade escolhida aqui -->
+    <div class="unid-bar">
+      <label for="f-unidade" class="rotulo">Você está vendo</label>
+      <select id="f-unidade" class="ctl"></select>
     </div>
 
     <div class="atencao-faixa" id="atencao" role="status" hidden></div>

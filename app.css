@@ -350,3 +350,16 @@ td select.ctl { padding-right: 2rem; background-position: right .5rem center; ba
 .matriz td, .matriz th { padding-inline: .6rem; }
 .pag-info { font-size: .84rem; color: var(--fg-muted); line-height: 1.55; padding: .8rem 1rem; border: 1px solid var(--line); border-radius: 12px; background: color-mix(in srgb, var(--accent) 5%, transparent); }
 .pag-info .rotulo { display: block; margin-bottom: .2rem; }
+
+/* ---------- unidade em destaque no painel ---------- */
+.un-sub { margin-top: .5rem; font-size: .84rem; color: var(--fg-muted); }
+.unid-bar { display: flex; align-items: center; flex-wrap: wrap; gap: .6rem 1rem; margin: 0 0 1.6rem; padding: .8rem 1rem; border-radius: var(--r-card); background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--un, var(--accent)); box-shadow: var(--shadow); transition: border-color .4s; }
+.unid-bar .pilulas button { min-height: 40px; padding: .35rem .95rem; font-size: .84rem; }
+.unid-bar .pilulas .cor { width: .8rem; height: .8rem; }
+.unid-bar .pilulas button[aria-checked="true"] { border-color: var(--un, var(--accent)); box-shadow: inset 0 0 0 1px var(--un, var(--accent)); background: color-mix(in srgb, var(--un, var(--accent)) 10%, var(--surface)); }
+.unid-bar .pilulas button[aria-checked="true"] .cor { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--un, var(--accent)); }
+.unid-bar .cont { min-width: 1.35rem; height: 1.35rem; padding: 0 .35rem; box-sizing: border-box; display: inline-grid; place-items: center; border-radius: 100px; background: #b8860b; color: #fff; font-size: .66rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.un-tag { display: inline-flex; align-items: center; gap: .35rem; font-size: .62rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
+.un-tag::before, .un-ponto::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--c); flex: none; }
+.un-ponto { display: inline-flex !important; align-items: center; gap: .3rem; }
+.marcado small .un-tag { margin-right: .2rem; }

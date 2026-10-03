@@ -3,10 +3,10 @@
 // um banco de dados em servidor, com login de verdade e proteção de dados de saúde (LGPD).
 
 const UNIDADES = [
-  { id: "cameta", end: "R. Padre Antônio Franco, 489", nome: "Cametá", clinica: true, farmacia: true },
-  { id: "abaetetuba", end: "Tv. Santos Dumont, 466 · Centro", nome: "Abaetetuba", clinica: true, farmacia: true },
-  { id: "belem", end: "Rod. Augusto Montenegro, 4300 · Parque Office", nome: "Belém", clinica: true, farmacia: false },
-  { id: "barcarena", end: "Av. Germano Aranha · Vila dos Cabanos", nome: "Barcarena", clinica: true, farmacia: false },
+  { id: "cameta", end: "R. Padre Antônio Franco, 489", nome: "Cametá", clinica: true, farmacia: true, cor: "#1c4a3d" },
+  { id: "abaetetuba", end: "Tv. Santos Dumont, 466 · Centro", nome: "Abaetetuba", clinica: true, farmacia: true, cor: "#a47c2c" },
+  { id: "belem", end: "Rod. Augusto Montenegro, 4300 · Parque Office", nome: "Belém", clinica: true, farmacia: false, cor: "#7a5c8a" },
+  { id: "barcarena", end: "Av. Germano Aranha · Vila dos Cabanos", nome: "Barcarena", clinica: true, farmacia: false, cor: "#2f6f8f" },
 ];
 
 // O cliente escolhe a ÁREA a ser avaliada. O procedimento é definido na avaliação.
