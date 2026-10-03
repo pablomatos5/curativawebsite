@@ -118,6 +118,11 @@ document.addEventListener("change", (e) => {
     Store.atualizar("agendamentos", a.id, { prof: e.target.value, status: "confirmado" });
     return tudo();
   }
+  if (e.target.matches("input[data-lim]")) {
+    const [un, d] = e.target.dataset.lim.split("|"), v = e.target.value.trim();
+    Store.definirLimite(un, +d, v === "" ? null : Math.max(0, Math.floor(+v) || 0));
+    return tudo();
+  }
   if (e.target.matches("input[data-est]")) {
     const [id, un] = e.target.dataset.est.split("|");
     Store.definirEstoque(id, un, +e.target.value);
@@ -162,6 +167,8 @@ function agenda(ag) {
   const doDia = ag.filter((a) => a.data === dia).sort((a, b) => a.hora.localeCompare(b.hora));
   const u = unidadeSel();
   $("#grade-dica").hidden = true;
+  $("#uso-dia").hidden = !u;
+  if (u) $("#uso-dia").innerHTML = usoTxt(u, dia);
   if (!u) {
     $("#plantao").innerHTML = "";
     $("#grade").className = "grade";
@@ -223,7 +230,7 @@ function escalas() {
   const todas = Store.escalas().filter((e) => !u || e.unidade === u);
   $("#s-txt").textContent = `Semana de ${curta(datas[0])} a ${curta(datas[5])}`;
   $("#s-hoje").hidden = semana === segundaDe(hojeIso);
-  $("#h-esc").innerHTML = `<tr><th>Profissional</th>${datas.map((d) => `<th class="${d === hojeIso ? "hoje" : ""}">${DIAS[numDia(d)]} <b>${curta(d)}</b></th>`).join("")}</tr>`;
+  $("#h-esc").innerHTML = `<tr><th>Profissional</th>${datas.map((d) => `<th class="${d === hojeIso ? "hoje" : ""}">${DIAS[numDia(d)]} <b>${curta(d)}</b>${u ? `<small class="uso">${usoTxt(u, d, true)}</small>` : ""}</th>`).join("")}</tr>`;
   $("#t-esc").innerHTML = Store.profissionais().map((p) => {
     const cel = (data) => {
       const passado = data < hojeIso;
@@ -384,10 +391,28 @@ function cabecalhoUnidade() {
   });
 }
 
+// "Pelo site: 4 de 6 avaliações" (ou "sem limite"); dia cheio fica em destaque
+function usoTxt(u, data, curto) {
+  const n = Store.avaliacoesSite(u, data), l = Store.limiteDia(u, data);
+  if (l === null) return curto ? `site: ${n}` : `Pelo site: ${n} <span>· sem limite</span>`;
+  const cls = n >= l ? "cheio" : "";
+  return curto ? `<span class="${cls}">site: ${n}/${l}</span>` : `<span class="${cls}">Pelo site: ${n} de ${l} avaliações${n >= l ? " · cheio" : ""}</span>`;
+}
+
+// tabela de limites: uma linha por unidade (ou só a escolhida), uma coluna por dia da semana
+function limitesTab() {
+  const uns = UNIDADES.filter((x) => x.clinica && (!unidadeSel() || x.id === unidadeSel()));
+  $("#h-lim").innerHTML = `<tr><th>Unidade</th>${[1, 2, 3, 4, 5, 6].map((d) => `<th>${DIAS[d]}</th>`).join("")}</tr>`;
+  $("#t-lim").innerHTML = uns.map((x) => {
+    const l = Store.limites()[x.id] || {};
+    return `<tr><td>${tagUn(x.id)}</td>${[1, 2, 3, 4, 5, 6].map((d) => `<td><input class="ctl" type="number" min="0" max="99" step="1" placeholder="—" value="${Number.isInteger(l[d]) ? l[d] : ""}" data-lim="${x.id}|${d}" aria-label="Limite de avaliações pelo site em ${esc(x.nome)}, ${DIAS[d]}"></td>`).join("")}</tr>`;
+  }).join("");
+}
+
 function tudo() {
   const ag = Store.agendamentos().filter(filtroUnidade);
   const ped = Store.pedidos().filter(filtroUnidade);
-  cabecalhoUnidade(); atencao(ag); kpis(ag, ped); agenda(ag); lista(ag); escalas(); pedidos(ped); estoqueTab();
+  cabecalhoUnidade(); atencao(ag); kpis(ag, ped); agenda(ag); lista(ag); escalas(); limitesTab(); pedidos(ped); estoqueTab();
 }
 
 $("#d-ant").onclick = () => { dia = iso(addDias(new Date(dia + "T12:00"), -1)); tudo(); };

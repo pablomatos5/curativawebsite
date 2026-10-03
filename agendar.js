@@ -38,8 +38,9 @@ function desenharDias() {
   let abertos = 0;
   $("#op-dia").innerHTML = dias.map((d) => {
     const tem = estado.unidade && estado.ambito && Object.keys(Store.livres(estado.unidade, d, estado.ambito)).length > 0;
+    const cheio = estado.unidade && Store.lotado(estado.unidade, d);
     if (tem) abertos++;
-    return opcao("dia", d, `<b>${d.slice(8)}</b>`, `${diaSemana(d)} · ${d.slice(5, 7)}`, d === estado.data && tem, !tem);
+    return opcao("dia", d, `<b>${d.slice(8)}</b>`, cheio ? "agenda cheia" : `${diaSemana(d)} · ${d.slice(5, 7)}`, d === estado.data && tem, !tem);
   }).join("");
   if (estado.data && !Object.keys(Store.livres(estado.unidade, estado.data, estado.ambito)).length) { estado.data = ""; estado.hora = ""; }
   $("#dia-info").textContent = abertos
@@ -112,7 +113,7 @@ btnAvancar.onclick = () => {
   if (!Store.livres(estado.unidade, estado.data, estado.ambito)[estado.hora]) { estado.hora = ""; irPara(3); resumo(); return alerta("Esse horário acabou de ser ocupado. Escolha outro."); }
   const ag = {
     // prof fica vazio: quem define o profissional da avaliação é a secretaria, no painel
-    id: protocolo("AG"), tipo: "avaliacao", ambito: estado.ambito, procedimento: "", unidade: estado.unidade, data: estado.data, hora: estado.hora, prof: "",
+    id: protocolo("AG"), canal: "site", tipo: "avaliacao", ambito: estado.ambito, procedimento: "", unidade: estado.unidade, data: estado.data, hora: estado.hora, prof: "",
     nome: $("#ag-nome").value.trim(), telefone: $("#ag-tel").value.trim(), email: $("#ag-email").value.trim(),
     obs: $("#ag-obs").value.trim(), status: "pendente", criado: new Date().toISOString(),
   };

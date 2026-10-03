@@ -363,3 +363,14 @@ td select.ctl { padding-right: 2rem; background-position: right .5rem center; ba
 .un-tag::before, .un-ponto::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--c); flex: none; }
 .un-ponto { display: inline-flex !important; align-items: center; gap: .3rem; }
 .marcado small .un-tag { margin-right: .2rem; }
+
+/* ---------- limite de avaliações por dia ---------- */
+.limites { margin-top: clamp(2.4rem, 5vh, 3.4rem); padding-top: clamp(1.8rem, 4vh, 2.6rem); border-top: 1px solid var(--line-soft); }
+.limites h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); margin-bottom: .6rem; }
+.limites .lead { max-width: 70ch; margin-bottom: 1.2rem; font-size: .95rem; }
+.tab-lim { min-width: 620px; }
+.tab-lim td .ctl { width: 4.6rem; text-align: center; }
+.tab-lim td .ctl::placeholder { color: var(--fg-faint); }
+.matriz th small.uso { display: block; margin-top: .25rem; font-size: .58rem; letter-spacing: .08em; color: var(--fg-faint); text-transform: none; font-weight: 500; }
+.uso .cheio, .uso-dia .cheio { color: #9a3412; font-weight: 600; }
+.uso-dia span span { color: var(--fg-faint); }

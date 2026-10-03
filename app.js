@@ -114,6 +114,15 @@ const Store = {
   definirEstoque(id, unidade, qtd) { const e = this.estoque(); (e[id] ||= {})[unidade] = Math.max(0, Math.floor(qtd) || 0); this.gravar("estoque", e); },
   moverEstoque(itens, unidade, sinal) { for (const it of itens) this.definirEstoque(it.id, unidade, this.disponivel(it.id, unidade) + sinal * it.qtd); },
 
+  // Limite de avaliações marcadas PELO SITE, por unidade e dia da semana: { cameta: { 1: 8, 6: 4 }, ... } (1 = segunda).
+  // Sem número = sem limite. Só conta o que a cliente marcou no site (canal "site"), menos as canceladas;
+  // o que a secretaria marca no painel não conta e não tem limite.
+  limites() { try { return JSON.parse(localStorage.getItem("curativa.limites")) || {}; } catch { return {}; } },
+  limiteDia(unidade, data) { const v = (this.limites()[unidade] || {})[numDia(data)]; return Number.isInteger(v) ? v : null; },
+  definirLimite(unidade, dia, v) { const l = this.limites(); l[unidade] ||= {}; if (v === null) delete l[unidade][dia]; else l[unidade][dia] = v; this.gravar("limites", l); },
+  avaliacoesSite(unidade, data) { return this.agendamentos().filter((a) => a.unidade === unidade && a.data === data && a.canal === "site" && a.status !== "cancelado").length; },
+  lotado(unidade, data) { const l = this.limiteDia(unidade, data); return l !== null && this.avaliacoesSite(unidade, data) >= l; },
+
   // folgas, férias e afastamentos por período: { id, prof, de, ate, motivo }
   bloqueios() { return this.ler("bloqueios"); },
   deFolga(prof, data, bloqueios = this.bloqueios()) { return bloqueios.find((b) => b.prof === prof && b.de <= data && data <= b.ate); },
@@ -150,6 +159,7 @@ const Store = {
   // Horários livres: { "09:00": [ids de quem pode atender] }. O horário some quando não sobra ninguém.
   livres(unidade, data, ambito) {
     const mapa = {}, horas = new Set();
+    if (this.lotado(unidade, data)) return mapa;
     this.emEscala(unidade, data, ambito).forEach((x) => x.horas.forEach((h) => horas.add(h)));
     for (const h of horas) {
       if (passou(data, h)) continue;
@@ -206,7 +216,7 @@ const Store = {
         // avaliação pendente chega do site sem profissional: a secretaria define ao confirmar
         const prof = tipo === "avaliacao" && status === "pendente" ? "" : livres[hora][0];
         this.add("agendamentos", { id: "AG-EX" + (i + 1), tipo, ambito, procedimento, unidade, data, hora, prof, nome,
-          telefone: "(91) 90000-000" + (i + 1), email: "", obs: "", status, criado: new Date().toISOString(), exemplo: true });
+          telefone: "(91) 90000-000" + (i + 1), email: "", obs: "", status, criado: new Date().toISOString(), exemplo: true, ...(tipo === "avaliacao" ? { canal: "site" } : {}) });
         break;
       }
     });
@@ -222,6 +232,8 @@ const Store = {
       id: "PD-EX" + (i + 1), unidade, nome, telefone: "(91) 90000-010" + (i + 1), tipo, arquivo, entrega,
       obs: tipo === "produto" ? "Body Mist, 2 unidades" : "", status, criado: new Date().toISOString(), exemplo: true,
     })));
+    // limites de exemplo (gravados depois dos agendamentos de exemplo, para não interferir neles)
+    this.gravar("limites", { cameta: { 1: 8, 2: 8, 3: 8, 4: 8, 5: 8, 6: 4 }, abaetetuba: { 1: 6, 2: 6, 3: 6, 4: 6, 5: 6, 6: 3 }, belem: { 1: 6, 2: 6, 3: 6, 4: 6, 5: 6 }, barcarena: { 1: 4, 3: 4, 5: 4 } });
     try { localStorage.setItem("curativa.semeado", "5"); } catch {}
   },
 };

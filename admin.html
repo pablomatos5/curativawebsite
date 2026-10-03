@@ -10,8 +10,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20261003b">
-<link rel="stylesheet" href="app.css?v=20261003b">
+<link rel="stylesheet" href="styles.css?v=20261003c">
+<link rel="stylesheet" href="app.css?v=20261003c">
 </head>
 <body>
 <div class="faixa-demo">Protótipo: sem login real e com dados fictícios. No sistema final, cada funcionário entra com usuário e senha próprios e só vê a sua unidade.</div>
@@ -68,6 +68,7 @@
         <strong id="d-txt"></strong>
         <button class="mini seta" id="d-prox" aria-label="Próximo dia"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         <button class="mini" id="d-hoje">Hoje</button>
+        <span class="chip uso-dia" id="uso-dia" hidden></span>
       </div>
       <div class="plantao" id="plantao"></div>
       <div class="grade" id="grade"></div>
@@ -107,6 +108,13 @@
         <li><span class="turno off">Folga</span> só naquele dia, ou folga/férias por período</li>
       </ul>
       <p class="aviso">Clique no × de um turno para tirar só aquele dia ou aquele dia da semana daqui em diante. Profissional inativo não recebe agendamentos.</p>
+
+      <!-- limite de avaliações marcadas pelo site, por unidade e dia da semana -->
+      <div class="limites">
+        <h3 class="display">Limite de avaliações <em>pelo site</em></h3>
+        <p class="lead">Quantas avaliações as clientes podem marcar <strong>pelo site</strong> em cada unidade, por dia. Ao chegar no limite, o site para de oferecer horários naquele dia. O que a secretaria marca no painel não conta e não tem limite. Deixe em branco para não limitar.</p>
+        <div class="tabela-wrap"><table class="tab-lim"><thead id="h-lim"></thead><tbody id="t-lim"></tbody></table></div>
+      </div>
     </section>
 
     <section class="aba" data-aba="pedidos" hidden style="background:none">
@@ -236,7 +244,7 @@
   </form>
 </dialog>
 
-<script src="app.js?v=20261003b"></script>
-<script src="admin.js?v=20261003b"></script>
+<script src="app.js?v=20261003c"></script>
+<script src="admin.js?v=20261003c"></script>
 </body>
 </html>
