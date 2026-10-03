@@ -153,3 +153,22 @@ if (menuBtn) {
   document.getElementById("menu").addEventListener("click", (e) => { if (e.target.closest("a")) abrir(false); });
   addEventListener("keydown", (e) => { if (e.key === "Escape") abrir(false); });
 }
+
+// "Como funciona": motion graphic em 3 cenas, sincronizado com os passos e com a linha dourada do caminho.
+// Avança sozinho enquanto a seção está na tela; passar o mouse num passo mostra a cena dele. Com "reduzir movimento", fica parado.
+(() => {
+  const sec = document.getElementById("como");
+  if (!sec) return;
+  const cenas = sec.querySelectorAll(".mg-c"), passos = sec.querySelectorAll(".caminho li");
+  let k = 0, timer = 0;
+  const mostrar = (n) => {
+    k = n; sec.style.setProperty("--k", n);
+    cenas.forEach((c, i) => c.classList.toggle("on", i === n));
+    passos.forEach((p, i) => { p.classList.toggle("ativa", i === n); p.classList.toggle("feita", i < n); });
+  };
+  const tocar = () => { clearInterval(timer); timer = setInterval(() => mostrar((k + 1) % cenas.length), 3600); };
+  if (reduce) return;
+  sec.classList.add("anima");
+  new IntersectionObserver(([e]) => { if (e.isIntersecting) { mostrar(0); tocar(); } else clearInterval(timer); }, { threshold: 0.35 }).observe(sec);
+  passos.forEach((p, i) => p.addEventListener("mouseenter", () => { mostrar(i); tocar(); }));
+})();

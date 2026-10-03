@@ -93,10 +93,41 @@
   <!-- COMO FUNCIONA -->
   <section id="como">
     <div class="wrap">
+      <div class="como-top">
       <div class="head">
         <span class="eyebrow rv">Como funciona</span>
         <h2 class="display rv" style="--i:1">Tudo começa por <em>uma avaliação.</em></h2>
         <p class="lead rv" style="--i:2">Você não precisa saber qual procedimento quer. Escolha a área, e o profissional indica o caminho.</p>
+      </div>
+      <!-- motion graphic: uma cena por passo, sincronizada com a linha do caminho (main.js) -->
+      <div class="como-anim rv" style="--i:2" aria-hidden="true">
+        <svg class="mg" viewBox="0 0 360 240">
+          <g class="mg-c on" data-k="0"><!-- 1: agendar, um dia marcado no calendário -->
+            <rect x="96" y="44" width="168" height="150" rx="14"/><path d="M96 78h168M130 34v20M230 34v20"/><path class="fino" d="M150 61h60"/>
+            <circle class="ponto" cx="124" cy="104" r="2.4"/><circle class="ponto" cx="152" cy="104" r="2.4"/><circle class="ponto" cx="180" cy="104" r="2.4"/><circle class="ponto" cx="208" cy="104" r="2.4"/><circle class="ponto" cx="236" cy="104" r="2.4"/><circle class="ponto" cx="124" cy="132" r="2.4"/><circle class="ponto" cx="152" cy="132" r="2.4"/><circle class="ponto" cx="180" cy="132" r="2.4"/><circle class="ponto" cx="208" cy="132" r="2.4"/><circle class="ponto" cx="236" cy="132" r="2.4"/><circle class="ponto" cx="124" cy="160" r="2.4"/><circle class="ponto" cx="152" cy="160" r="2.4"/><circle class="ponto" cx="180" cy="160" r="2.4"/><circle class="ponto" cx="208" cy="160" r="2.4"/><circle class="ponto" cx="236" cy="160" r="2.4"/>
+            <circle class="ouro d" pathLength="1" style="--t:.4s" cx="208" cy="132" r="12"/>
+            <path class="ouro d" pathLength="1" style="--t:1s" d="M202 132l4.5 4.5 8-9"/>
+            <circle class="ouro onda" style="--t:1.5s" cx="208" cy="132" r="12"/>
+          </g>
+          <g class="mg-c" data-k="1"><!-- 2: plano, pontos do planejamento no rosto e prancheta preenchida -->
+            <g transform="translate(-48 50) scale(1.2)">
+              <path d="M140 10c-25 0-38 17-38 40 0 19 7 28 11 38 4 10 13 18 27 18s23-8 27-18c4-10 11-19 11-38 0-23-13-40-38-40z"/>
+              <path class="fino" d="M119 52h13M148 52h13M140 56v17M131 88c6 4 12 4 18 0M102 56c-5-1-7 3-6 9s4 9 8 8M178 56c5-1 7 3 6 9s-4 9-8 8"/>
+              <path class="ouro fino d" pathLength="1" style="--t:.2s" d="M92 46h96M140 6v104"/>
+              <circle class="ponto ouro pop" style="--t:0.50s" cx="123" cy="36" r="3"/><circle class="ponto ouro pop" style="--t:0.72s" cx="157" cy="36" r="3"/><circle class="ponto ouro pop" style="--t:0.94s" cx="114" cy="72" r="3"/><circle class="ponto ouro pop" style="--t:1.16s" cx="166" cy="72" r="3"/><circle class="ponto ouro pop" style="--t:1.38s" cx="140" cy="98" r="3"/>
+            </g>
+            <rect x="222" y="74" width="86" height="112" rx="8"/><path d="M250 68h30v12h-30z"/>
+            <path class="ouro d" pathLength="1" style="--t:0.50s" d="M234 104l4 4 7-8"/><path class="fino d" pathLength="1" style="--t:0.65s" d="M256 104h40"/><path class="ouro d" pathLength="1" style="--t:0.95s" d="M234 130l4 4 7-8"/><path class="fino d" pathLength="1" style="--t:1.10s" d="M256 130h40"/><path class="ouro d" pathLength="1" style="--t:1.40s" d="M234 156l4 4 7-8"/><path class="fino d" pathLength="1" style="--t:1.55s" d="M256 156h40"/>
+          </g>
+          <g class="mg-c" data-k="2"><!-- 3: procedimento marcado, relógio avança até o horário e selo de confirmado -->
+            <circle cx="140" cy="126" r="58"/><path class="fino" d="M140 74v8M140 170v8M88 126h8M184 126h8"/>
+            <path d="M140 126v-28"/><path class="ouro ponteiro" d="M140 126l30 -16"/><circle class="ponto" cx="140" cy="126" r="3.5"/>
+            <circle class="ouro d" pathLength="1" style="--t:1s" cx="262" cy="80" r="24"/>
+            <path class="ouro d" pathLength="1" style="--t:1.5s" d="M251 80l7 7 13-14"/>
+            <path class="ouro pop" style="--t:1.9s" d="M300 140v-12M294 134h12"/><path class="ouro pop" style="--t:2.1s" d="M226 40v-10M221 35h10"/><path class="fino pop" style="--t:2.3s" d="M70 64v-10M65 59h10"/>
+          </g>
+        </svg>
+      </div>
       </div>
       <ol class="caminho">
         <li class="rv"><span class="num">1</span><h3 class="display">Agende a avaliação</h3><p>Pelo site, em poucos passos: unidade, área (facial, nariz, corporal, íntima ou capilar) e horário.</p></li>

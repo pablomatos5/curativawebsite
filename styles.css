@@ -565,3 +565,43 @@ main > section.theme-verde::before { opacity: .2; }
   .nav .nav-loja { width: 2.6rem; height: 2.6rem; padding: 0; justify-content: center; box-sizing: border-box; } .nav .nav-loja span { display: none; }
 }
 @media (max-width: 1200px) and (min-width: 1081px) { .nav ul { gap: .95rem; } .nav .so-desk { display: none; } }
+
+/* ---------- "Como funciona": motion graphic ---------- */
+.como-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 400px); gap: clamp(1.5rem, 4vw, 3.5rem); align-items: center; }
+.como-anim svg { display: block; width: 100%; height: auto; overflow: visible; }
+@media (max-width: 900px) { .como-top { grid-template-columns: 1fr; } .como-anim { width: min(300px, 80%); margin: -1rem auto 1.5rem; } }
+.mg * { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.mg .fino { stroke-width: 1.1; opacity: .55; }
+.mg .ouro { stroke: var(--gold); }
+.mg .ouro.fino { opacity: .8; }
+.mg .ponto { fill: var(--accent); stroke: none; opacity: .45; }
+.mg .ponto.ouro { fill: var(--gold); opacity: 1; }
+.mg-c { opacity: 0; transition: opacity .6s var(--ease); }
+.mg-c.on { opacity: 1; }
+.mg .d { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.mg-c.on .d { animation: mg-traco 1.1s var(--ease) var(--t, .2s) forwards; }
+.mg .pop { transform-box: fill-box; transform-origin: center; scale: 0; }
+.mg-c.on .pop { animation: mg-pop .5s var(--ease) var(--t, .4s) forwards; }
+.mg .onda { transform-box: fill-box; transform-origin: center; opacity: 0; }
+.mg-c.on .onda { animation: mg-onda 1.6s ease-out var(--t, 1.2s) infinite; }
+.mg .ponteiro { transform-box: view-box; transform-origin: 140px 126px; rotate: -150deg; }
+.mg-c.on .ponteiro { animation: mg-gira 1.8s var(--ease) .2s forwards; }
+@keyframes mg-traco { to { stroke-dashoffset: 0; } }
+@keyframes mg-pop { 60% { scale: 1.3; } to { scale: 1; } }
+@keyframes mg-onda { from { scale: 1; opacity: .7; } to { scale: 2.3; opacity: 0; } }
+@keyframes mg-gira { to { rotate: 0deg; } }
+
+/* linha dourada que avança de um passo ao próximo; o passo da vez se acende */
+.caminho li { z-index: 1; }
+.caminho::after { content: ""; position: absolute; left: 1.6rem; top: calc(1.6rem - 1px); height: 2px; border-radius: 2px; background: var(--gold); width: calc(var(--k, 0) * (100% + 1.4rem) / 3); transition: width 1.2s var(--ease); }
+/* o destaque age no conteúdo do passo, não no <li>, para não disputar a transição de entrada (.rv) */
+.anima .caminho li > * { transition: opacity .5s; }
+.anima .caminho li:not(.ativa):not(.feita) > * { opacity: .5; }
+.caminho li.ativa .num { animation: mg-anel 1.8s ease-out infinite; }
+@keyframes mg-anel { from { box-shadow: 0 0 0 1px rgb(164 124 44 / .55), 0 0 0 8px var(--bg), 0 0 0 8px rgb(164 124 44 / .45); } to { box-shadow: 0 0 0 1px rgb(164 124 44 / .55), 0 0 0 8px var(--bg), 0 0 0 22px rgb(164 124 44 / 0); } }
+@media (max-width: 800px) { .caminho::after { display: none; } }
+/* sem movimento: só a primeira cena, já desenhada */
+@media (prefers-reduced-motion: reduce) {
+  .mg * { animation: none !important; } .mg .d { stroke-dashoffset: 0; } .mg .pop { scale: 1; } .mg .ponteiro { rotate: 0deg; }
+  .caminho li.ativa .num { animation: none; }
+}
