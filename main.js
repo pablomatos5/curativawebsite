@@ -128,9 +128,18 @@ if (dlgVideo) {
 }
 
 // cenas com transformação de traço (nariz): só animam com a carta virada, e ficam paradas com "reduzir movimento"
+// Cada vez que a carta vira, a cena recomeça do zero: assim o "antes" sempre aparece antes do "depois".
 document.querySelectorAll(".flip").forEach((card) => {
   const svgs = card.querySelectorAll("svg.cena");
-  const ligar = (on) => svgs.forEach((s) => { if (s.pauseAnimations) on && !reduce ? s.unpauseAnimations() : s.pauseAnimations(); });
+  let ligada = false;
+  const ligar = (on) => {
+    svgs.forEach((s) => {
+      if (!s.pauseAnimations) return;
+      if (on && !reduce) { if (!ligada) s.setCurrentTime(0); s.unpauseAnimations(); }
+      else { s.pauseAnimations(); s.setCurrentTime(0); }
+    });
+    ligada = on && !reduce;
+  };
   ligar(false);
   const ver = () => ligar(card.matches(":hover, :focus-visible, .is-flipped"));
   ["mouseenter", "mouseleave", "focus", "blur", "click"].forEach((ev) => card.addEventListener(ev, () => setTimeout(ver, 0)));
