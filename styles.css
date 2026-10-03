@@ -594,9 +594,7 @@ main > section.theme-verde::before { opacity: .2; }
 /* linha dourada que avança de um passo ao próximo; o passo da vez se acende */
 .caminho li { z-index: 1; }
 .caminho::after { content: ""; position: absolute; left: 1.6rem; top: calc(1.6rem - 1px); height: 2px; border-radius: 2px; background: var(--gold); width: calc(var(--k, 0) * (100% + 1.4rem) / 3); transition: width 1.2s var(--ease); }
-/* o destaque age no conteúdo do passo, não no <li>, para não disputar a transição de entrada (.rv) */
-.anima .caminho li > * { transition: opacity .5s; }
-.anima .caminho li:not(.ativa):not(.feita) > * { opacity: .5; }
+/* os três passos ficam sempre legíveis: só o círculo do passo da vez e a linha dourada indicam o andamento */
 .caminho li.ativa .num { animation: mg-anel 1.8s ease-out infinite; }
 @keyframes mg-anel { from { box-shadow: 0 0 0 1px rgb(164 124 44 / .55), 0 0 0 8px var(--bg), 0 0 0 8px rgb(164 124 44 / .45); } to { box-shadow: 0 0 0 1px rgb(164 124 44 / .55), 0 0 0 8px var(--bg), 0 0 0 22px rgb(164 124 44 / 0); } }
 @media (max-width: 800px) { .caminho::after { display: none; } }

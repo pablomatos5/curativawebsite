@@ -155,7 +155,7 @@ if (menuBtn) {
 }
 
 // "Como funciona": motion graphic em 3 cenas, sincronizado com os passos e com a linha dourada do caminho.
-// Avança sozinho enquanto a seção está na tela; passar o mouse num passo mostra a cena dele. Com "reduzir movimento", fica parado.
+// Avança sozinho enquanto a seção está na tela, sem depender do mouse. Com "reduzir movimento", fica parado.
 (() => {
   const sec = document.getElementById("como");
   if (!sec) return;
@@ -170,5 +170,4 @@ if (menuBtn) {
   if (reduce) return;
   sec.classList.add("anima");
   new IntersectionObserver(([e]) => { if (e.isIntersecting) { mostrar(0); tocar(); } else clearInterval(timer); }, { threshold: 0.35 }).observe(sec);
-  passos.forEach((p, i) => p.addEventListener("mouseenter", () => { mostrar(i); tocar(); }));
 })();
