@@ -460,10 +460,10 @@ footer a:hover { color: #faf6ee; }
 
 /* veios de mármore bem leves atrás das seções claras; versão fina e mais apagada nos blocos verdes */
 main > section:not(.theme-farmacia):not(.banda)::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background: url("assets/marmore.svg") center / cover no-repeat; opacity: .5; }
+  background: url("assets/marmore.webp") center / cover no-repeat; opacity: .5; }
 main > section:not(.theme-farmacia):not(.banda):nth-of-type(even)::before { scale: -1 1; }
 main > section:not(.theme-farmacia):not(.banda):nth-of-type(3n)::before { scale: 1 -1; }
-main > section.theme-verde::before { background-image: url("assets/marmore-verde.svg"); opacity: .34; }
+main > section.theme-verde::before { background-image: url("assets/marmore-verde.webp"); opacity: .34; }
 main > section > .wrap, main > section > .blob { z-index: 1; }
 @media (max-width: 800px) { main > section:not(.theme-farmacia):not(.banda)::before { opacity: .38; } main > section.theme-verde::before { opacity: .26; } }
 
@@ -475,7 +475,7 @@ main > section > .wrap, main > section > .blob { z-index: 1; }
 
 /* símbolo do logo como marca-d'água (a cor vem do fundo, o desenho vem da máscara) */
 .marca-dagua { position: absolute; right: -4%; top: 50%; translate: 0 -50%; width: min(46vw, 440px); aspect-ratio: 1; pointer-events: none; opacity: .09; z-index: 0;
-  background: #e3c98f; -webkit-mask: url("assets/logo-marca.png") center / contain no-repeat; mask: url("assets/logo-marca.png") center / contain no-repeat; }
+  background: #e3c98f; -webkit-mask: url("assets/logo-marca.webp") center / contain no-repeat; mask: url("assets/logo-marca.webp") center / contain no-repeat; }
 .marca-dagua.rodape { right: auto; left: -3%; top: 46%; width: min(60vw, 380px); opacity: .06; }
 footer { position: relative; overflow: hidden; } footer .wrap, .demo-bar { position: relative; z-index: 1; }
 
@@ -503,7 +503,7 @@ main > section.theme-verde::before { opacity: .2; }
 
 /* faixa da equipe: título em fundo sólido, foto logo abaixo (nenhum texto sobre a foto) */
 .banda { min-height: 0; display: block; overflow: hidden; isolation: auto; }
-.banda::before { content: ""; position: absolute; inset: 0; z-index: 0; background: url("assets/marmore-verde.svg") center / cover no-repeat; opacity: .2; }
+.banda::before { content: ""; position: absolute; inset: 0; z-index: 0; background: url("assets/marmore-verde.webp") center / cover no-repeat; opacity: .2; }
 .banda .wrap { width: auto; padding-block: var(--sec-y); z-index: 1; }
 .banda-foto { margin-top: clamp(1.8rem, 4vh, 3rem); aspect-ratio: 16 / 8; border-radius: var(--r-card); overflow: hidden; outline: 1px solid rgb(227 201 143 / .3); outline-offset: -8px; box-shadow: 0 30px 60px -30px rgb(0 0 0 / .6); }
 .banda .banda-foto img { position: static; inset: auto; z-index: auto; width: 100%; height: 116%; object-fit: cover; object-position: 50% 46%; translate: 0 var(--par, 0); margin-top: -8%; }
@@ -576,16 +576,16 @@ main > section.theme-verde::before { opacity: .2; }
 .mg .ouro.fino { opacity: .8; }
 .mg .ponto { fill: var(--accent); stroke: none; opacity: .45; }
 .mg .ponto.ouro { fill: var(--gold); opacity: 1; }
-.mg-c { opacity: 0; transition: opacity .6s var(--ease); }
+.mg-c { opacity: 0; transition: opacity .4s var(--ease); }
 .mg-c.on { opacity: 1; }
 .mg .d { stroke-dasharray: 1; stroke-dashoffset: 1; }
-.mg-c.on .d { animation: mg-traco 1.1s var(--ease) var(--t, .2s) forwards; }
+.mg-c.on .d { animation: mg-traco .8s var(--ease) calc(var(--t, .2s) * .6) forwards; }
 .mg .pop { transform-box: fill-box; transform-origin: center; scale: 0; }
-.mg-c.on .pop { animation: mg-pop .5s var(--ease) var(--t, .4s) forwards; }
+.mg-c.on .pop { animation: mg-pop .45s var(--ease) calc(var(--t, .4s) * .6) forwards; }
 .mg .onda { transform-box: fill-box; transform-origin: center; opacity: 0; }
-.mg-c.on .onda { animation: mg-onda 1.6s ease-out var(--t, 1.2s) infinite; }
+.mg-c.on .onda { animation: mg-onda 1.6s ease-out calc(var(--t, 1.2s) * .6) infinite; }
 .mg .ponteiro { transform-box: view-box; transform-origin: 140px 126px; rotate: -150deg; }
-.mg-c.on .ponteiro { animation: mg-gira 1.8s var(--ease) .2s forwards; }
+.mg-c.on .ponteiro { animation: mg-gira 1.2s var(--ease) .1s forwards; }
 @keyframes mg-traco { to { stroke-dashoffset: 0; } }
 @keyframes mg-pop { 60% { scale: 1.3; } to { scale: 1; } }
 @keyframes mg-onda { from { scale: 1; opacity: .7; } to { scale: 2.3; opacity: 0; } }
@@ -603,3 +603,37 @@ main > section.theme-verde::before { opacity: .2; }
   .mg * { animation: none !important; } .mg .d { stroke-dashoffset: 0; } .mg .pop { scale: 1; } .mg .ponteiro { rotate: 0deg; }
   .caminho li.ativa .num { animation: none; }
 }
+
+/* "Como funciona" no celular: a ilustração fica presa no topo enquanto os passos passam por baixo */
+@media (max-width: 900px) {
+  .como-top { display: contents; }
+  .como-anim { position: sticky; top: 4.6rem; z-index: 3; width: min(230px, 66%); margin: .4rem auto 1.8rem; padding: .7rem 1rem; box-sizing: border-box;
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: var(--r-card); box-shadow: 0 14px 30px -18px rgb(22 51 42 / .45); }
+  .caminho { gap: 2.6rem; }
+}
+
+/* ---------- desempenho em celular e telas de toque ---------- */
+/* vidro desfocado e animações contínuas custam caro na rolagem do celular: troca por superfícies sólidas e fica parado */
+@media (hover: none), (max-width: 900px) {
+  .glass { backdrop-filter: none; -webkit-backdrop-filter: none; background: color-mix(in srgb, var(--surface) 94%, transparent); }
+  .nav.docked, .nav.aberto { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgb(250 246 238 / .97); }
+  .blob, .flutua { animation: none; }
+  .tilt { will-change: auto; }
+  dialog::backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+/* ---------- celular: página inicial mais enxuta ---------- */
+.dica-toque { display: none; }
+@media (hover: none) { .dica-mouse { display: none; } .dica-toque { display: inline; } }
+@media (max-width: 700px) {
+  :root { --sec-y: 3.2rem; }                                     /* menos vazio entre as seções */
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem 1.6rem; margin-top: 2rem; }
+  /* produtos da farmácia em carrossel de deslizar (antes eram 7 cartões altos empilhados) */
+  .products { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: .9rem;
+    margin-inline: calc(var(--pad) * -1); padding: .4rem var(--pad) 1.4rem; margin-top: 2rem; }
+  .products::-webkit-scrollbar { display: none; }
+  .products > * { flex: 0 0 78%; scroll-snap-align: center; }
+}
+
+/* celular: a cena troca na hora (os traços já entram se desenhando), sem esmaecer uma sobre a outra */
+@media (max-width: 900px) { .mg-c { transition: none; } }

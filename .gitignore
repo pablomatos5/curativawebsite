@@ -7,3 +7,10 @@ curativa-segredos.php
 # arquivos de teste e rascunho
 _teste.html
 *.bak
+# originais das imagens (o site usa as versões .webp, bem mais leves)
+assets/*.jpg
+assets/*.png
+!assets/favicon.png
+assets/marmore.svg
+assets/marmore-verde.svg
+_teste2.html

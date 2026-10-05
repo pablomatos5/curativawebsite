@@ -4,7 +4,7 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 // nav vira "vidro" depois do topo + barra de progresso + parallax, tudo num único rAF por scroll
 const nav = document.getElementById("nav");
 const barra = document.getElementById("progresso");
-const pars = [...document.querySelectorAll("[data-par]")];
+const pars = matchMedia("(hover: none)").matches ? [] : [...document.querySelectorAll("[data-par]")]; // parallax só com mouse
 let pendente = false;
 function aoRolar() {
   pendente = false;
@@ -155,7 +155,8 @@ if (menuBtn) {
 }
 
 // "Como funciona": motion graphic em 3 cenas, sincronizado com os passos e com a linha dourada do caminho.
-// Avança sozinho enquanto a seção está na tela, sem depender do mouse. Com "reduzir movimento", fica parado.
+// PC: avança sozinho enquanto a seção está na tela. Celular: a ilustração fica presa no topo e mostra a cena do passo
+// que está no meio da tela, conforme a pessoa rola. Nada depende do mouse. Com "reduzir movimento", fica parado.
 (() => {
   const sec = document.getElementById("como");
   if (!sec) return;
@@ -166,8 +167,25 @@ if (menuBtn) {
     cenas.forEach((c, i) => c.classList.toggle("on", i === n));
     passos.forEach((p, i) => { p.classList.toggle("ativa", i === n); p.classList.toggle("feita", i < n); });
   };
-  const tocar = () => { clearInterval(timer); timer = setInterval(() => mostrar((k + 1) % cenas.length), 3600); };
+  const tocar = () => { clearInterval(timer); timer = setInterval(() => mostrar((k + 1) % cenas.length), 2600); };
+  const celular = matchMedia("(max-width: 900px)");
   if (reduce) return;
   sec.classList.add("anima");
-  new IntersectionObserver(([e]) => { if (e.isIntersecting) { mostrar(0); tocar(); } else clearInterval(timer); }, { threshold: 0.35 }).observe(sec);
+  mostrar(0);
+  new IntersectionObserver(([e]) => { if (e.isIntersecting && !celular.matches) { mostrar(0); tocar(); } else clearInterval(timer); }, { threshold: 0.2 }).observe(sec);
+  // celular: a cada quadro de rolagem, mostra a cena do passo mais perto do meio da tela
+  let agendado = false;
+  const pelaRolagem = () => {
+    agendado = false;
+    if (!celular.matches) return;
+    const r = sec.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > innerHeight) return;
+    const meio = innerHeight / 2;
+    let melhor = 0, dist = Infinity;
+    passos.forEach((p, i) => { const q = p.getBoundingClientRect(), d = Math.abs(q.top + q.height / 2 - meio); if (d < dist) { dist = d; melhor = i; } });
+    if (melhor !== k || !cenas[k].classList.contains("on")) mostrar(melhor);
+  };
+  addEventListener("scroll", () => { if (!agendado) { agendado = true; requestAnimationFrame(pelaRolagem); } }, { passive: true });
+  pelaRolagem();
+  celular.addEventListener("change", () => { clearInterval(timer); mostrar(0); });
 })();

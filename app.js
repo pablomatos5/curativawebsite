@@ -36,14 +36,14 @@ const PROCEDIMENTOS = [
 // Produtos prontos da farmácia (pronta entrega, retirada na unidade).
 // PREÇOS E ESTOQUES SÃO DE EXEMPLO: trocar pelos reais antes de qualquer uso.
 const PRODUTOS = [
-  { id: "mist", nome: "Body Mist", cat: "Perfumaria", preco: 59.9, img: "assets/f10.jpg", pos: "50% 55%", desc: "Perfuma e refresca a pele. 130 ml.", variantes: ["Floral azul", "Pera", "Floral rosa", "Héron (masculino)"], cores: ["#9ec5e8", "#d5d98a", "#f2b6c6", "#2f3a2a"] },
-  { id: "mist-kit", nome: "Body Mist · kit com 4", cat: "Perfumaria", preco: 199.9, img: "assets/f-bodysplash.jpg", pos: "50% 62%", desc: "As quatro fragrâncias da linha." },
-  { id: "base-stick", nome: "Base Stick FPS 50", cat: "Maquiagem", preco: 89.9, img: "assets/f-base.jpg", pos: "50% 78%", desc: "Alta cobertura e toque seco.", variantes: ["Tom 1", "Tom 2", "Tom 3", "Tom 4"], cores: ["#f1d3b8", "#dfb48f", "#c08a62", "#8d5a3b"] },
-  { id: "multistick", nome: "Multistick", cat: "Maquiagem", preco: 69.9, img: "assets/f26.jpg", pos: "50% 72%", desc: "Blush, batom e sombra em um bastão." },
-  { id: "gloss", nome: "Gloss labial", cat: "Lábios", preco: 49.9, img: "assets/f1.jpg", pos: "50% 58%", desc: "Cor e hidratação, com capa e chaveiro." },
-  { id: "serum", nome: "Sérum para cílios e sobrancelhas", cat: "Cuidado", preco: 79.9, img: "assets/f24.jpg", pos: "50% 62%", desc: "Para uso diário." },
-  { id: "kit-skin", nome: "Kit skincare", cat: "Skincare", preco: 149.9, img: "assets/f31.jpg", pos: "50% 78%", desc: "Gel de limpeza, água micelar e hidratante." },
-  { id: "hidratante", nome: "Hidratante facial", cat: "Skincare", preco: 69.9, img: "assets/f38.jpg", pos: "50% 35%", desc: "Hidratação para todos os dias." },
+  { id: "mist", nome: "Body Mist", cat: "Perfumaria", preco: 59.9, img: "assets/f10.webp", pos: "50% 55%", desc: "Perfuma e refresca a pele. 130 ml.", variantes: ["Floral azul", "Pera", "Floral rosa", "Héron (masculino)"], cores: ["#9ec5e8", "#d5d98a", "#f2b6c6", "#2f3a2a"] },
+  { id: "mist-kit", nome: "Body Mist · kit com 4", cat: "Perfumaria", preco: 199.9, img: "assets/f-bodysplash.webp", pos: "50% 62%", desc: "As quatro fragrâncias da linha." },
+  { id: "base-stick", nome: "Base Stick FPS 50", cat: "Maquiagem", preco: 89.9, img: "assets/f-base.webp", pos: "50% 78%", desc: "Alta cobertura e toque seco.", variantes: ["Tom 1", "Tom 2", "Tom 3", "Tom 4"], cores: ["#f1d3b8", "#dfb48f", "#c08a62", "#8d5a3b"] },
+  { id: "multistick", nome: "Multistick", cat: "Maquiagem", preco: 69.9, img: "assets/f26.webp", pos: "50% 72%", desc: "Blush, batom e sombra em um bastão." },
+  { id: "gloss", nome: "Gloss labial", cat: "Lábios", preco: 49.9, img: "assets/f1.webp", pos: "50% 58%", desc: "Cor e hidratação, com capa e chaveiro." },
+  { id: "serum", nome: "Sérum para cílios e sobrancelhas", cat: "Cuidado", preco: 79.9, img: "assets/f24.webp", pos: "50% 62%", desc: "Para uso diário." },
+  { id: "kit-skin", nome: "Kit skincare", cat: "Skincare", preco: 149.9, img: "assets/f31.webp", pos: "50% 78%", desc: "Gel de limpeza, água micelar e hidratante." },
+  { id: "hidratante", nome: "Hidratante facial", cat: "Skincare", preco: 69.9, img: "assets/f38.webp", pos: "50% 35%", desc: "Hidratação para todos os dias." },
 ];
 const brl = (v) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const nomeProduto = (id) => acha(PRODUTOS, id).nome || id;
