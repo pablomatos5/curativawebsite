@@ -637,3 +637,12 @@ main > section.theme-verde::before { opacity: .2; }
 
 /* celular: a cena troca na hora (os traços já entram se desenhando), sem esmaecer uma sobre a outra */
 @media (max-width: 900px) { .mg-c { transition: none; } }
+
+/* celular: mármore no tamanho natural, repetindo pela altura da seção (esticado para "cover" os veios ficavam
+   enormes e borrados numa tela estreita) e um pouco mais presente */
+@media (max-width: 800px) {
+  /* versão do celular: a imagem + ela espelhada, então a repetição não tem emenda */
+  main > section:not(.theme-farmacia):not(.banda)::before { background-image: url("assets/marmore-cel.webp"); opacity: .62; background-size: 760px auto; background-repeat: repeat-y; background-position: 30% 0; }
+  main > section.theme-verde::before { background-image: url("assets/marmore-verde-cel.webp"); opacity: .3; }
+  .banda::before { background-image: url("assets/marmore-verde-cel.webp"); background-size: 760px auto; background-repeat: repeat-y; opacity: .22; }
+}
